@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -44,9 +45,9 @@ import org.openjdk.jmh.annotations.Warmup;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 5)
-@Measurement(iterations = 3)
-@Fork(1)
+@Warmup(iterations = 10)
+@Measurement(iterations = 5)
+@Fork(2)
 @State(Scope.Thread)
 public class IndexingTreePerfTest {
 
@@ -111,10 +112,19 @@ public class IndexingTreePerfTest {
 	 */
 	private IndexQuery invocationOverviewQuery;
 
+	
+	/**
+	 * ForkJoinPool
+	 * 
+	 * @throws Exception
+	 */
+	ForkJoinPool forkJoinPool;
+	
 	/**
 	 * Set up, prepare indexing tree.
 	 */
 	@Setup(Level.Trial)
+
 	public void initIndexingTree() throws Exception {
 		RootBranchFactory rootBranchFactory = new RootBranchFactory();
 		indexingTree = rootBranchFactory.getObject();
@@ -127,6 +137,7 @@ public class IndexingTreePerfTest {
 		chained.add(idProcessor);
 		chained.add(indexerProcessor);
 		InvocationModifierCmrProcessor invocationProcessor = new InvocationModifierCmrProcessor(chained);
+		forkJoinPool = new ForkJoinPool();
 
 		for (int i = 0; i < invocations; i++) {
 			InvocationSequenceData data = getInvocationSequenceDataInstance(children);
@@ -180,6 +191,25 @@ public class IndexingTreePerfTest {
 	}
 
 	// Query benchmarks
+	@Benchmark
+	public List<DefaultData> queryTimerDataForkJoin() {
+		return indexingTree.query(aggregatedTimerDataQuery, forkJoinPool);
+	}
+
+	@Benchmark
+	public List<DefaultData> queryTimerData15MinsTimeframeForkJoin() {
+		return indexingTree.query(aggregatedTimerDataQuery15MinsTimeframe, forkJoinPool);
+	}
+
+	@Benchmark
+	public List<DefaultData> queryTimerDataMethodForkJoin() {
+		return indexingTree.query(aggregatedTimerDataQueryMethod, forkJoinPool);
+	}
+
+	@Benchmark
+	public List<DefaultData> queryInvocationOverviewForkJoin() {
+		return indexingTree.query(invocationOverviewQuery, forkJoinPool);
+	}
 
 	@Benchmark
 	public List<DefaultData> queryTimerData() {
@@ -200,6 +230,7 @@ public class IndexingTreePerfTest {
 	public List<DefaultData> queryInvocationOverview() {
 		return indexingTree.query(invocationOverviewQuery);
 	}
+	
 
 	// Query fork/join benchmarks
 
