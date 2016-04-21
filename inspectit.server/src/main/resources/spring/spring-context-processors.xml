@@ -25,6 +25,9 @@
 	<bean id="systemInformationPersistingCmrProcessor" class="rocks.inspectit.server.processor.impl.SystemInformationPersistingCmrProcessor" />
 	<bean id="sqlExclusiveTimeCmrProcessor" class="rocks.inspectit.server.processor.impl.SqlExclusiveTimeCmrProcessor" />
 	<bean id="timerDataChartingCmrProcessor" class="rocks.inspectit.server.processor.impl.TimerDataChartingCmrProcessor" />
+	<bean id="diagnosisCmrProcessor" class="rocks.inspectit.server.processor.impl.DiagnosisCmrProcessor">
+		<constructor-arg index="0" type="double" value="1000.0"/>
+	</bean>
 	<bean id="invocationModifierCmrProcessor" class="rocks.inspectit.server.processor.impl.InvocationModifierCmrProcessor">
 		<constructor-arg>
 			<util:list value-type="rocks.inspectit.server.processor.AbstractCmrDataProcessor">
@@ -48,7 +51,9 @@
 		<ref bean="systemInformationPersistingCmrProcessor" />
 		<ref bean="sqlExclusiveTimeCmrProcessor" />
 		<ref bean="timerDataChartingCmrProcessor" />
+		<ref bean="diagnosisCmrProcessor" />
 		<ref bean="invocationModifierCmrProcessor" />
+		<ref bean="diagnosisCmrProcessor" />
 		<ref bean="inxfluxProcessor" />
 		<ref bean="recorderCmrProcessor" /> <!-- Must be last when all are processed -->
 	</util:list>
