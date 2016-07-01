@@ -74,17 +74,19 @@ public class TimeWastingOperationsRule {
 
 	private List<InvocationSequenceData> asInvocationSequenceDataList(List<InvocationSequenceData> invocationSequences, final List<InvocationSequenceData> resultList) {
 		for (InvocationSequenceData invocationSequence : invocationSequences) {
-			if (InvocationSequenceDataHelper.calculateExclusiveTime(invocationSequence) > 0.0) {
-				resultList.add(invocationSequence);
-			}
-			// if (null != invocationSequence.getTimerData() &&
-			// invocationSequence.getTimerData().isExclusiveTimeDataAvailable()) {
-			// resultList.add(invocationSequence);
-			// } else if (null != invocationSequence.getSqlStatementData() &&
-			// invocationSequence.getSqlStatementData().isExclusiveTimeDataAvailable()) {
-			// invocationSequence.setTimerData(invocationSequence.getSqlStatementData());
+			// if
+			// (InvocationSequenceDataHelper.calculateExclusiveTime(invocationSequence)
+			// > 0.0) {
 			// resultList.add(invocationSequence);
 			// }
+			if (null != invocationSequence.getTimerData()
+					&& invocationSequence.getTimerData().isExclusiveTimeDataAvailable()) {
+				resultList.add(invocationSequence);
+			} else if (null != invocationSequence.getSqlStatementData()
+					&& invocationSequence.getSqlStatementData().isExclusiveTimeDataAvailable()) {
+				invocationSequence.setTimerData(invocationSequence.getSqlStatementData());
+				resultList.add(invocationSequence);
+			}
 			asInvocationSequenceDataList(invocationSequence.getNestedSequences(), resultList);
 		}
 

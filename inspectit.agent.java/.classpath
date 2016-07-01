@@ -8,6 +8,7 @@
 		<accessrules>
 			<accessrule kind="accessible" pattern="com/sun/management/**"/>
 		</accessrules>
+
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

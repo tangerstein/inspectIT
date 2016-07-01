@@ -9,6 +9,19 @@ evaluationDependsOn(':inspectit.shared.all')
 evaluationDependsOn(':inspectit.shared.cs')
 defaultTasks 'releaseAndAnalyze'
 
+/** used by the eclipse buildship plugin */
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+/** defined to have it included in Eclipse as source */
+sourceSets {
+	externalResources {
+		resources {
+			srcDir mainExtResources
+		}
+	}
+}
+
 /** Some server specific properties */
 ext {
 	distJarName = 'inspectit-cmr'
@@ -28,15 +41,16 @@ configurations {
 
 /** Depend on inspectit.shared.all and cs, testCompile must depend on shared all test sources because of TestBase class */
 dependencies {
+	compile files('lib/weka.jar')
 	compile project(':inspectit.shared.all')
 	compile project(':inspectit.shared.cs')
-	testCompile project(':inspectit.shared.all').sourceSets.test.output
+	testCompile project (path: ':inspectit.shared.all', configuration: 'testArchives')
 }
 
 /** Compile compatibility to 1.7 for all compile tasks */
 tasks.withType(JavaCompile) { 
-	sourceCompatibility = '1.7'
-	targetCompatibility = '1.7'
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
 }
 
 /** 
