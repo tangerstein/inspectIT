@@ -23,6 +23,7 @@ public class ClusterEngine {
 	/**
 	 * Configuration of the hierarchical clusterer and the distance function.
 	 */
+	// TODO: Array statt String + Kommentar erweitern
 	private static final String HIERARCHICAL_CLUSTERER_CONFIG = "-N 1 -L SINGLE -P -A \"weka.core.EuclideanDistance -R first-5\"";
 
 	/**
@@ -33,9 +34,11 @@ public class ClusterEngine {
 	 *            the instances, which will be clustered
 	 * @param weights
 	 *            the weights of the attribute
-	 * @return String representation of the cluster result
+	 * @return String representation of the cluster result, null if ... TODO
 	 */
-	public String cluster(Instances data, Double[] weights) {
+	// TODO: abfangen, wenn weight array weniger / mehr Einträge hat oder 0 ...
+	// Grenzfälle ... Äquivalenzklassen
+	private String cluster(Instances data, Double[] weights) {
 		HierarchicalClusterer hierarchicClusterer = new HierarchicalClusterer();
 		// Set the WEKA cluster result
 		for (int i = 0; i < weights.length; i++) {
@@ -46,8 +49,8 @@ public class ClusterEngine {
 		String result = null;
 		try {
 			// Configuration of the cluster algorithm: filtering
+			// TODO: Configuration mitgeben lassen
 			hierarchicClusterer.setOptions(weka.core.Utils.splitOptions(HIERARCHICAL_CLUSTERER_CONFIG));
-			hierarchicClusterer.buildClusterer(data);
 			String[] options = new String[2];
 			options[0] = "-C";
 			options[1] = "last";
@@ -61,8 +64,13 @@ public class ClusterEngine {
 			hierarchicClusterer.buildClusterer(newData);
 
 			result = hierarchicClusterer.toString();
-
+			System.out.println(result);
+			//
+			// Matcher m = Pattern.compile("\(([^]+)]]\)").matcher(result);
+			//
+			// System.out.println(m.group(1));
 		} catch (Exception e) {
+			// TODO: Log Error
 			e.printStackTrace();
 		}
 
@@ -224,8 +232,11 @@ public class ClusterEngine {
 	 * @return the clusterList
 	 */
 	public ArrayList<Instances> createClusterList(Instances instances, Double[] weights, int level) {
-		ClusterNode resultNode = WekaClusterParser.parseCluster(cluster(instances, weights), instances,
+		String result = cluster(instances, weights);
+		// TODO: Debug log result
+		WekaClusterParser parser = new WekaClusterParser(result, instances,
 				Collections.list(instances.enumerateAttributes()));
+		ClusterNode resultNode = parser.parseCluster(null, Collections.list(instances.enumerateAttributes()));
 		return convertToClusterList(resultNode, level);
 
 	}

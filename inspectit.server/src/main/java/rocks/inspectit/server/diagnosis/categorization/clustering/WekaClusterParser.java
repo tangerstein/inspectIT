@@ -18,12 +18,17 @@ public class WekaClusterParser {
 	/**
 	 * Iterates over the WEKA result String.
 	 */
-	private static StringCharacterIterator iterator;
+	private StringCharacterIterator iterator;
 
 	/**
 	 * Global instances are needed for the recursive approach.
 	 */
-	private static Instances globalInstances;
+	private Instances globalInstances;
+
+	public WekaClusterParser(String clusterResultString, Instances instances, ArrayList<Attribute> attributeList) {
+		createStringIterator(clusterResultString);
+		setInstances(instances);
+	}
 
 	/**
 	 * Sets the String result.
@@ -33,32 +38,23 @@ public class WekaClusterParser {
 	 * @param instances
 	 *            all unsorted instances
 	 */
-	private static void setStringresult(String clusterResultString, Instances instances) {
+	private void createStringIterator(String clusterResultString) {
 		// removes all unused information from the String
 		clusterResultString = clusterResultString.replaceAll(":[^,\\)]*[,]", ",").replaceAll(":[^,\\)]*[\\)]", ")")
 				.replaceAll("Cluster 0\n", "").replaceAll("\n", "");
 		iterator = new StringCharacterIterator(clusterResultString);
-		globalInstances = instances;
 	}
 
 	/**
-	 * Parse Cluster.
+	 * Setter
 	 * 
-	 * @param clusterResultString
-	 *            the WEKA cluster result
 	 * @param instances
-	 *            the unsorted instances (needed, to map the id in the WEKA result to an instance
-	 *            object)
-	 * @param attributeList
-	 *            list of used attributes
-	 * @return the root of the cluster tree
+	 *            the globalInstances
 	 */
-	public static ClusterNode parseCluster(String clusterResultString, Instances instances,
-			ArrayList<Attribute> attributeList) {
-		setStringresult(clusterResultString, instances);
-		return parseCluster(null, attributeList);
-
+	private void setInstances(Instances instances) {
+		globalInstances = instances;
 	}
+
 
 	/**
 	 * Creates a ClusterNode from the WEKA Cluster result.
@@ -69,7 +65,7 @@ public class WekaClusterParser {
 	 *            a list of all attributes
 	 * @return a Cluster Node
 	 */
-	private static ClusterNode parseCluster(ClusterNode parent, ArrayList<Attribute> attributeList) {
+	public ClusterNode parseCluster(ClusterNode parent, ArrayList<Attribute> attributeList) {
 		String currentID = "";
 		ClusterNode newNode = new ClusterNode(parent);
 		ArrayList<ClusterNode> clusterChildren = new ArrayList<ClusterNode>();

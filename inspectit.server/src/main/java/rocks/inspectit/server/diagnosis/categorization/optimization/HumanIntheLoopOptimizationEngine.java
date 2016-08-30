@@ -246,7 +246,7 @@ public class HumanIntheLoopOptimizationEngine {
 	 * main.
 	 * 
 	 * @param args
-	 *            arguements.
+	 *            arguments.
 	 */
 	public static void main(String[] args) {
 		Instances randomInstances = InstancesProvider.createRandomInstances(100);
