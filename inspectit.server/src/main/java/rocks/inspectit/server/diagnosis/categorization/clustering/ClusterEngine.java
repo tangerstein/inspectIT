@@ -50,7 +50,6 @@ public class ClusterEngine {
 		try {
 			// Configuration of the cluster algorithm: filtering
 			// TODO: Configuration mitgeben lassen
-			hierarchicClusterer.setOptions(weka.core.Utils.splitOptions(HIERARCHICAL_CLUSTERER_CONFIG));
 			String[] options = new String[2];
 			options[0] = "-C";
 			options[1] = "last";
