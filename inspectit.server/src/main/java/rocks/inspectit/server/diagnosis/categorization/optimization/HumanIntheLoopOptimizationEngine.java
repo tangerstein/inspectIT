@@ -70,21 +70,18 @@ public class HumanIntheLoopOptimizationEngine {
 	private ArrayList<ClusterResult> generateNewResults() {
 		ArrayList<ClusterResult> results = new ArrayList<ClusterResult>();
 		// Baseline
-		results.add(new ClusterResult(clustering.createClusterList(instances, weights, level), weights));
+		results.add(clustering.clusterOptimizedKMeans(instances, weights));
 		for (int i = 0; i < weights.length; i++) {
 			// Increase attribute
 			Double[] manipulatedWeights = new Double[weights.length];
 			System.arraycopy(weights, 0, manipulatedWeights, 0, weights.length);
 			manipulatedWeights[i] *= this.factor;
-			results.add(new ClusterResult(clustering.createClusterList(instances, manipulatedWeights, level),
-					manipulatedWeights));
+			results.add(clustering.clusterOptimizedKMeans(instances, manipulatedWeights));
 			// Decrease Attribute
 			Double[] manipulatedWeights2 = new Double[weights.length];
 			System.arraycopy(weights, 0, manipulatedWeights2, 0, weights.length);
 			manipulatedWeights2[i] *= (1 / this.factor);
-			results.add(new ClusterResult(clustering.createClusterList(instances, manipulatedWeights2, level),
-					manipulatedWeights2));
-
+			results.add(clustering.clusterOptimizedKMeans(instances, manipulatedWeights2));
 		}
 		return results;
 	}
@@ -246,7 +243,7 @@ public class HumanIntheLoopOptimizationEngine {
 	 * main.
 	 * 
 	 * @param args
-	 *            arguments.
+	 *            arguements.
 	 */
 	public static void main(String[] args) {
 		Instances randomInstances = InstancesProvider.createRandomInstances(100);

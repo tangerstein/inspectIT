@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.diagnosis.categorization.clustering.ClusterEngine;
 import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
@@ -57,6 +59,11 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	private Instances instances;
 
 	/**
+	 * The logger of this class.
+	 */
+	@Log
+	Logger log;
+	/**
 	 * Access to the invocation tree.
 	 */
 	@Autowired
@@ -77,7 +84,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	@Override
 	public synchronized void onNewDiagnosisResult(Collection<ProblemOccurrence> problemOccurrences) {
 		for (ProblemOccurrence po : problemOccurrences) {
-			long invocIdNode = po.getProblemContext().getInvocationId();
+			long invocIdNode = po.getRequestRoot().getInvocationId();
 			List<InvocationSequenceData> nodes = accessService.getInvocationSequenceOverview(0, Integer.MAX_VALUE,
 					null);
 			InvocationSequenceData invocationNode = new InvocationSequenceData();
@@ -108,7 +115,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 					new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType, exclusiveDuration });
 		}
 
-		System.out.println("NumberOfInstances: " + instancesList.size());
+		log.debug("NumberOfInstances: " + instancesList.size());
 
 		if (instancesList.size() >= CLUSTER_THRESHOLD) {
 			ArrayList<Object[]> instancesListCopy = new ArrayList<Object[]>(instancesList);
@@ -160,7 +167,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			@Override
 			public void run() {
 				ClusterEngine cEngine = new ClusterEngine();
-				System.out.println("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
+				log.debug("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
 				cEngine.createClusterResult(DiagnosisResultService.this.instances,
 						new Double[] { 1., 1., 1., 1., 1., 1. }, 5).print();
 			}

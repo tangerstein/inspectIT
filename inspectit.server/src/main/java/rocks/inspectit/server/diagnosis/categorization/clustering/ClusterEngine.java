@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Collectors;
 
 import rocks.inspectit.server.diagnosis.categorization.InstancesProvider;
+import weka.clusterers.EM;
 import weka.clusterers.HierarchicalClusterer;
 import weka.core.Attribute;
 import weka.core.Instance;
@@ -25,6 +26,11 @@ public class ClusterEngine {
 	 */
 	// TODO: Array statt String + Kommentar erweitern
 	private static final String HIERARCHICAL_CLUSTERER_CONFIG = "-N 1 -L SINGLE -P -A \"weka.core.EuclideanDistance -R first-5\"";
+
+	/**
+	 * Configuration of the EM Clusterer.
+	 */
+	private static final String EM_CLUSTERER_CONFIG = "-I 100 -N -1 -X 10 -max -1 -ll-cv 1.0E-6 -ll-iter 1.0E-6 -M 1.0E-6 -K 10 -num-slots 1 -S 100";
 
 	/**
 	 * Clusters the given instances and adds some weighting to the cluster
@@ -74,6 +80,56 @@ public class ClusterEngine {
 		}
 
 		return result;
+
+	}
+
+	/**
+	 * Hierarchical Clustering: Clusters the given instances and adds some
+	 * weighting to the cluster algorithm.
+	 * 
+	 * @param data
+	 *            the instances, which will be clustered
+	 * @param weights
+	 *            the weights of the attribute
+	 * @return String representation of the cluster result
+	 */
+	public ClusterResult clusterOptimizedKMeans(Instances data, Double[] weights) {
+		EM optimizedKMeans = new EM();
+		ArrayList<Instances> clusterResult = new ArrayList<Instances>();
+		// Set the WEKA cluster result
+		for (int i = 0; i < weights.length; i++) {
+			for (int j = 0; j < data.numInstances(); j++) {
+				data.instance(j).attribute(i).setWeight(weights[i]);
+			}
+		}
+		try {
+			optimizedKMeans.setOptions(weka.core.Utils.splitOptions(EM_CLUSTERER_CONFIG));
+			optimizedKMeans.buildClusterer(data);
+			ArrayList<ArrayList<Instance>> clusterResultList = new ArrayList<ArrayList<Instance>>();
+
+			for (Instance instance : data) {
+				while ((clusterResultList.size()) <= (optimizedKMeans.clusterInstance(instance))) {
+					clusterResultList.add(new ArrayList<Instance>());
+				}
+				clusterResultList.get(optimizedKMeans.clusterInstance(instance)).add(instance);
+
+			}
+			for (ArrayList<Instance> cluster : clusterResultList) {
+				if (!cluster.isEmpty()) {
+					Instances instances = new Instances("ProblemInstances",
+							Collections.list(data.enumerateAttributes()), cluster.size());
+					for (Instance instance : cluster) {
+						instances.add(instance);
+					}
+					clusterResult.add(instances);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return new ClusterResult(clusterResult, weights);
 
 	}
 
@@ -255,11 +311,12 @@ public class ClusterEngine {
 		return new ClusterResult(createClusterList(instances, weights, level), weights);
 	}
 
+
 	/**
 	 * Main Method for test cases.
 	 * 
 	 * @param args
-	 *            arguements
+	 *            arguments
 	 */
 	public static void main(String[] args) {
 		ClusterEngine clustering = new ClusterEngine();

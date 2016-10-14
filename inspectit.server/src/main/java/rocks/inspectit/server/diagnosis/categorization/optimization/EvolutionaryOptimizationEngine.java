@@ -18,8 +18,7 @@ import org.opt4j.viewer.ViewerModule;
 
 import rocks.inspectit.server.diagnosis.categorization.InstancesProvider;
 import rocks.inspectit.server.diagnosis.categorization.clustering.ClusterEngine;
-import weka.core.Instance;
-import weka.core.InstanceComparator;
+import rocks.inspectit.server.diagnosis.categorization.clustering.ClusterResultEvaluation;
 import weka.core.Instances;
 
 /**
@@ -32,7 +31,7 @@ public class EvolutionaryOptimizationEngine implements Creator<DoubleGenotype> {
 
 	@Override
 	public DoubleGenotype create() {
-		DoubleGenotype genotype = new DoubleGenotype(0, 5);
+		DoubleGenotype genotype = new DoubleGenotype(0, 1000);
 		genotype.init(new Random(), 6);
 		return genotype;
 	}
@@ -44,30 +43,50 @@ public class EvolutionaryOptimizationEngine implements Creator<DoubleGenotype> {
 	 *            arguments
 	 */
 	public static void main(String[] args) {
+		startOptimization(1000, 1000, 6);
+	}
+
+	/**
+	 * Start the optimization.
+	 * 
+	 * @param generations
+	 *            the generation size
+	 * @param population
+	 *            the population size
+	 * @param numberOfWeights
+	 *            the number of weights
+	 * @return the optimized weights
+	 */
+	public static Double[] startOptimization(int generations, int population, int numberOfWeights) {
 		EvolutionaryAlgorithmModule ea = new EvolutionaryAlgorithmModule();
-		ea.setGenerations(1000);
-		ea.setAlpha(10000);
+		ea.setGenerations(generations);
+		ea.setAlpha(population);
 		ClusterProblemModule dtlz = new ClusterProblemModule();
 		ViewerModule viewer = new ViewerModule();
-		viewer.setCloseOnStop(false);
+		viewer.setCloseOnStop(true);
 		Opt4JTask task = new Opt4JTask(false);
 		task.init(ea, dtlz, viewer);
+		Double[] optimizedWeights = new Double[numberOfWeights];
 		try {
 			task.execute();
 			Archive archive = task.getInstance(Archive.class);
 			for (Individual individual : archive) {
+				DoubleGenotype optimizedGenotype = (DoubleGenotype) individual.getGenotype();
+				optimizedWeights = optimizedGenotype.toArray(new Double[optimizedGenotype.size()]);
 				System.out.println(individual.getGenotype().toString());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			task.close();
+			return optimizedWeights;
 		}
 	}
 }
 
 /**
- * Converts the given Cluster Solution (Genotype) into a Phenotype (ClusterResult).
+ * Converts the given Cluster Solution (Genotype) into a Phenotype
+ * (ClusterResult).
  * 
  * @author Tobias Angerstein
  *
@@ -78,7 +97,7 @@ class ClusterProblemDecoder implements Decoder<DoubleGenotype, ArrayList<Instanc
 	public ArrayList<Instances> decode(DoubleGenotype genotype) {
 		Double[] weights = genotype.toArray(new Double[genotype.size()]);
 		ClusterEngine engine = new ClusterEngine();
-		return engine.createClusterList(InstancesProvider.getStaticInstances(), weights, 4);
+		return engine.createClusterList(InstancesProvider.getDVDStoreInstances(), weights, 4);
 	}
 }
 
@@ -93,45 +112,24 @@ class ClusterProblemEvaluator implements Evaluator<ArrayList<Instances>> {
 	public Objectives evaluate(ArrayList<Instances> phenotype) {
 		Objectives objectives = new Objectives();
 		// Objective will be maximized
-		objectives.add("objective", Sign.MAX,
-				fitness(phenotype, InstancesProvider.getReferenceCluster(), InstancesProvider.getStaticInstances()));
+		objectives.add("objective", Sign.MAX, fitness(phenotype, InstancesProvider.getReferenceCluster()));
 		return objectives;
 	}
 
 	/**
-	 * Determines the fitness of a cluster result compared to a reference. cluster result
+	 * Determines the fitness of a cluster result compared to a reference.
+	 * cluster result
 	 * 
 	 * @param clusters
 	 *            a list of clusters
 	 * @param referenceClusters
 	 *            the reference cluster result
-	 * @param allInstances
-	 *            list of all used instances
 	 * @return fitness can be between Integer.MIN and Integer.Max
 	 */
-	public double fitness(ArrayList<Instances> clusters, ArrayList<Instances> referenceClusters,
-			Instances allInstances) {
-		InstanceComparator comparator = new InstanceComparator();
-		if (referenceClusters.size() != clusters.size()) {
-			return Double.MIN_VALUE;
-		} else {
-			int fitness = 0;
-				for (Instance p : allInstances) {
-					for (int clusterIndex = 0; clusterIndex < clusters.size(); clusterIndex++) {
-					for (Instance instance : clusters.get(clusterIndex)) {
-						if (comparator.compare(p, instance) == 0) {
-							for (Instance referenceInstance : referenceClusters.get(clusterIndex)) {
-								if (comparator.compare(p, referenceInstance) == 0) {
-									fitness++;
-								}
-							}
-						}
-						}
-
-				}
-			}
-			return fitness;
-		}
+	public double fitness(ArrayList<Instances> clusters, ArrayList<Instances> referenceClusters) {
+		ClusterEngine engine = new ClusterEngine();
+		Double[] errorRates = ClusterResultEvaluation.getErrorRate(clusters);
+		return (1.0 / (errorRates[0] * errorRates[4]));
 	}
 
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.jamesframework.core.problems.GenericProblem;
 import org.jamesframework.core.problems.Problem;
@@ -18,7 +17,7 @@ import org.jamesframework.core.problems.sol.Solution;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.neigh.Move;
 import org.jamesframework.core.search.neigh.Neighbourhood;
-import org.jamesframework.core.search.stopcriteria.MaxRuntime;
+import org.jamesframework.core.search.stopcriteria.MaxSteps;
 
 import rocks.inspectit.server.diagnosis.categorization.InstancesProvider;
 import rocks.inspectit.server.diagnosis.categorization.clustering.ClusterEngine;
@@ -37,6 +36,19 @@ public class HillClimbingOptimizationEngine {
 	 *            arguements
 	 */
 	public static void main(String[] args) {
+		System.out.println(startOptimization(1000));
+
+	}
+
+	/**
+	 * Start the optimization.
+	 * 
+	 * @param maxSteps
+	 *            defines the maximum number of generations
+	 * 
+	 * @return the optimized weights
+	 */
+	public static Double[] startOptimization(int maxSteps) {
 		ClusterProblemData data = new ClusterProblemData(6);
 		ClusterProblemObjective obj = new ClusterProblemObjective();
 		RandomSolutionGenerator<ClusterSolution, ClusterProblemData> rsg = (r, d) -> {
@@ -48,7 +60,7 @@ public class HillClimbingOptimizationEngine {
 			// manipulate weights randomly
 			Set<Integer> randomIndices = getRandomNumberOfIndices(weightList.size());
 			for (int i : randomIndices) {
-				weightList.set(i, weightList.get(i) * (new Random().nextDouble() * 5));
+				weightList.set(i, weightList.get(i) * (new Random().nextDouble() * 1000));
 			}
 			// create and return solution
 			return new ClusterSolution(weightList);
@@ -57,15 +69,14 @@ public class HillClimbingOptimizationEngine {
 		Problem<ClusterSolution> problem = new GenericProblem<>(data, obj, rsg);
 
 		RandomDescent<ClusterSolution> hillClimber = new RandomDescent<>(problem, new ClusterProblemOptNeighbourhood());
-		hillClimber.addStopCriterion(new MaxRuntime(60, TimeUnit.SECONDS));
+		hillClimber.addStopCriterion(new MaxSteps(maxSteps));
 		hillClimber.start();
 		ClusterSolution bestSolution = hillClimber.getBestSolution();
 		String result = "";
 		for (int i = 0; i < bestSolution.getWeights().length; i++) {
 			result += "[" + bestSolution.getWeights()[i] + "]";
 		}
-		System.out.println(result);
-
+		return bestSolution.getWeights();
 	}
 	
 	/**
@@ -196,9 +207,9 @@ class ClusterProblemObjective implements Objective<ClusterSolution, ClusterProbl
 
 		// Compute the fitness of the current cluster result
 		double fitness = new ClusterProblemEvaluator().fitness(
-				new ClusterEngine().createClusterList(InstancesProvider.getStaticInstances(),
+				new ClusterEngine().createClusterList(InstancesProvider.getDVDStoreInstances(),
 						solution.getWeights(), 4),
-				InstancesProvider.getReferenceCluster(), InstancesProvider.getStaticInstances());
+				InstancesProvider.getReferenceCluster());
 
 		return SimpleEvaluation.WITH_VALUE(fitness);
 

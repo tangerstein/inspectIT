@@ -30,7 +30,7 @@ public class InstancesProvider {
 	/**
 	 * Amount of static instances.
 	 */
-	private static final int NUMBER_OF_STATIC_INSTANCES = 30;
+	private static final int NUMBER_OF_STATIC_INSTANCES = 100;
 
 	/**
 	 * Provides a default attribute list.
@@ -125,7 +125,7 @@ public class InstancesProvider {
 
 		} else {
 			referenceCluster = new ClusterEngine().createClusterList(getStaticInstances(),
-					new Double[] { 1., 100000000., 1., 1., 1., 1. }, 4);
+					new Double[] { 1., 100000., 1., 1., 1., 1. }, 4);
 			FileOutputStream outputStream;
 			try {
 				outputStream = new FileOutputStream(objectFile);
@@ -180,5 +180,20 @@ public class InstancesProvider {
 			}
 		}
 		return instances;
+	}
+
+	public static weka.core.Instances getDVDStoreInstances() {
+		Instances instances = null;
+		try {
+			instances = new Instances(new BufferedReader(new FileReader("DVDStoreProblemInstances.arff")));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			return instances;
+		}
 	}
 }

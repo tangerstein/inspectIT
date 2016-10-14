@@ -3,7 +3,16 @@ package rocks.inspectit.server.diagnosis.categorization.optimization;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Generates a Plackett & Burman experimental design.
+ * 
+ * @author Tobias Angerstein
+ *
+ */
 public class PlackettBurmanGenerator {
+	/**
+	 * Initial column
+	 */
 	private static final int[] EIGHT_RUNS = new int[] { 1, 1, 1, 0, 1, 0, 0 };
 
 	public static ArrayList<int[]> getMatrix(int numberOfAttributes) {
@@ -22,10 +31,23 @@ public class PlackettBurmanGenerator {
 		return matrix;
 	}
 
+	/**
+	 * Returns the number of runs.
+	 * 
+	 * @param numberOfAttributes
+	 *            the number of attributes which have to be diagnosed
+	 * @return the needed number of runs
+	 */
 	public static int getNumberOfRuns(int numberOfAttributes) {
 		return ((Double) (Math.ceil((numberOfAttributes + 1) / 4.0))).intValue() * 4;
 	}
 
+	/**
+	 * Main class for testing issues.
+	 * 
+	 * @param args
+	 *            arguments
+	 */
 	public static void main(String[] args) {
 		System.out.println(getNumberOfRuns(7));
 
