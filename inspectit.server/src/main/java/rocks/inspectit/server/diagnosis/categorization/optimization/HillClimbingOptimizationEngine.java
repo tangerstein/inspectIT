@@ -33,7 +33,7 @@ public class HillClimbingOptimizationEngine {
 	 * main.
 	 * 
 	 * @param args
-	 *            arguements
+	 *            arguments
 	 */
 	public static void main(String[] args) {
 		System.out.println(startOptimization(1000));

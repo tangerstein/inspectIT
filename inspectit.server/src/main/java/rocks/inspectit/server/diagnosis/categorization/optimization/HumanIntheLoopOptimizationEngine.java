@@ -156,8 +156,6 @@ public class HumanIntheLoopOptimizationEngine {
 		System.err.println("Please choose the level of the cluster result tree!");
 		this.level = Integer.parseInt(scanner.nextLine());
 		System.out.println("Please choose the factor, which manipulates the weights in each iteration!");
-		this.factor = Integer.parseInt(scanner.nextLine());
-
 		int iteration = 0;
 		while (readString != null) {
 			System.err.println(
@@ -193,7 +191,7 @@ public class HumanIntheLoopOptimizationEngine {
 	 * @param results
 	 *            the Cluster results, which are visualized
 	 */
-	private void printWholeClusterResults(ArrayList<ClusterResult> results) {
+	public void printWholeClusterResults(ArrayList<ClusterResult> results) {
 		for (int resultIndex = 0; resultIndex < results.size(); resultIndex++) {
 			System.out.println(
 					"\n----------------------------------------------------------------------------------------------\n"
@@ -243,7 +241,7 @@ public class HumanIntheLoopOptimizationEngine {
 	 * main.
 	 * 
 	 * @param args
-	 *            arguements.
+	 *            arguments.
 	 */
 	public static void main(String[] args) {
 		Instances randomInstances = InstancesProvider.createRandomInstances(100);

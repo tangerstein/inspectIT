@@ -127,7 +127,6 @@ class ClusterProblemEvaluator implements Evaluator<ArrayList<Instances>> {
 	 * @return fitness can be between Integer.MIN and Integer.Max
 	 */
 	public double fitness(ArrayList<Instances> clusters, ArrayList<Instances> referenceClusters) {
-		ClusterEngine engine = new ClusterEngine();
 		Double[] errorRates = ClusterResultEvaluation.getErrorRate(clusters);
 		return (1.0 / (errorRates[0] * errorRates[4]));
 	}

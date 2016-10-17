@@ -182,6 +182,11 @@ public class InstancesProvider {
 		return instances;
 	}
 
+	/**
+	 * Provides measured DVD store instances.
+	 * 
+	 * @return DVD store problem instances.
+	 */
 	public static weka.core.Instances getDVDStoreInstances() {
 		Instances instances = null;
 		try {

@@ -11,10 +11,17 @@ import java.util.Arrays;
  */
 public class PlackettBurmanGenerator {
 	/**
-	 * Initial column
+	 * Initial column.
 	 */
 	private static final int[] EIGHT_RUNS = new int[] { 1, 1, 1, 0, 1, 0, 0 };
 
+	/**
+	 * Returns the Placket-Burman matrix.
+	 * 
+	 * @param numberOfAttributes
+	 *            the number of attributes
+	 * @return the matrix.
+	 */
 	public static ArrayList<int[]> getMatrix(int numberOfAttributes) {
 		ArrayList<int[]> matrix = new ArrayList<int[]>();
 		matrix.add(Arrays.copyOf(EIGHT_RUNS, numberOfAttributes));
