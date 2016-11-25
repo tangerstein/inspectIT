@@ -2,6 +2,7 @@ package rocks.inspectit.server.processor.impl;
 
 import javax.persistence.EntityManager;
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import rocks.inspectit.server.cache.IBuffer;
@@ -11,6 +12,7 @@ import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.MethodSensorData;
 import rocks.inspectit.shared.all.communication.data.InvocationAwareData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
  * Buffer inserter data processor. Inserts only {@link MethodSensorData} data objects that are not
@@ -20,6 +22,13 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  * 
  */
 public class BufferInserterCmrProcessor extends AbstractCmrDataProcessor {
+
+
+	/**
+	 * The logger of this class.
+	 */
+	@Log
+	Logger log;
 
 	/**
 	 * Buffer to inser elements to.
@@ -32,6 +41,9 @@ public class BufferInserterCmrProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	protected void processData(DefaultData defaultData, EntityManager entityManager) {
+		if (defaultData instanceof InvocationSequenceData) {
+			log.info(defaultData.getId() + "");
+		}
 		buffer.put(new BufferElement<MethodSensorData>((MethodSensorData) defaultData));
 	}
 

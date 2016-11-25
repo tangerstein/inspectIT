@@ -3,7 +3,7 @@ package rocks.inspectit.server.diagnosis.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,35 +84,53 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	@Override
 	public synchronized void onNewDiagnosisResult(Collection<ProblemOccurrence> problemOccurrences) {
 		for (ProblemOccurrence po : problemOccurrences) {
-			long invocIdNode = po.getRequestRoot().getInvocationId();
-			List<InvocationSequenceData> nodes = accessService.getInvocationSequenceOverview(0, Integer.MAX_VALUE,
-					null);
-			InvocationSequenceData invocationNode = new InvocationSequenceData();
-			for (InvocationSequenceData node : nodes) {
-				if (node.getId() == invocIdNode) {
-					invocationNode = node;
+			log.info("Neue Instanz");
+			long rootId = po.getRequestRoot().getInvocationId();
+
+			long problemId = po.getProblemContext().getInvocationId();
+			InvocationSequenceData template = new InvocationSequenceData();
+			template.setId(rootId);
+			InvocationSequenceData invocationRootNode = accessService.getInvocationSequenceDetail(template);
+			if (invocationRootNode != null) {
+				InvocationSequenceData invocationNode = null;
+				ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
+				invocationQueue.add(invocationRootNode);
+				while (!invocationQueue.isEmpty()) {
+					InvocationSequenceData node = invocationQueue.poll();
+					if (node.getId() == problemId) {
+						invocationNode = node;
+						log.info("Invocation found!! -- Party :)");
+						break;
+					} else {
+						invocationQueue.addAll(node.getNestedSequences());
+					}
 				}
+				if (invocationNode == null) {
+					log.warn("InvocationSequence not found!");
+				}
+				Double exclusiveDuration = invocationNode.getDuration();
+
+				String rootCause = po.getRootCause().getMethodIdent() + "";
+				rootCauses.add(rootCause);
+
+				String nodeType = po.getCauseStructure().getCauseType().name();
+				nodeTypes.add(nodeType);
+
+				String problemContext = po.getProblemContext().getMethodIdent() + "";
+				problemContexts.add(problemContext);
+
+				String entryPoint = po.getRequestRoot().getMethodIdent() + "";
+				entryPoints.add(entryPoint);
+
+				String globalContext = po.getGlobalContext().getMethodIdent() + "";
+				globalContexts.add(globalContext);
+
+				instancesList.add(new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType,
+						exclusiveDuration });
+			} else {
+				log.info("Root that is null: " + rootId + "");
 			}
 
-			Double exclusiveDuration = invocationNode.getDuration();
-
-			String rootCause = po.getRootCause().getMethodIdent() + "";
-			rootCauses.add(rootCause);
-
-			String nodeType = po.getCauseStructure().getCauseType().name();
-			nodeTypes.add(nodeType);
-
-			String problemContext = po.getProblemContext().getMethodIdent() + "";
-			problemContexts.add(problemContext);
-
-			String entryPoint = po.getRequestRoot().getMethodIdent() + "";
-			entryPoints.add(entryPoint);
-
-			String globalContext = po.getGlobalContext().getMethodIdent() + "";
-			globalContexts.add(globalContext);
-
-			instancesList.add(
-					new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType, exclusiveDuration });
 		}
 
 		log.debug("NumberOfInstances: " + instancesList.size());
@@ -126,8 +144,8 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	}
 
 	/**
-	 * Starts the cluster engine in a new thread and converts the stored. instances into the WEKA-
-	 * instances objects
+	 * Starts the cluster engine in a new thread and converts the stored.
+	 * instances into the WEKA- instances objects
 	 * 
 	 * @param instancesList
 	 *            list of stored instances
