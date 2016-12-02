@@ -6,7 +6,9 @@ import java.util.HashMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.StatUtils;
 import org.apache.commons.math3.util.FastMath;
+import org.slf4j.Logger;
 
+import rocks.inspectit.shared.all.spring.logger.Log;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -34,6 +36,12 @@ public class ClusterResult {
 	 * The corresponding weights.
 	 */
 	private Double[] weights;
+
+	/**
+	 * The logger of this class.
+	 */
+	@Log
+	Logger log;
 
 	/**
 	 * 
@@ -105,11 +113,12 @@ public class ClusterResult {
 	 * Prints the analysis of the cluster result.
 	 */
 	public void print() {
-		System.out.println("Anzahl Cluster: " + getWekaResult().size() + "\n");
+		System.out.println("Number of clusters: " + getWekaResult().size() + "\n");
 		System.out.println("Weights: " + getWeightsString());
 		int clusterCounter = 0;
 		for (Instances cluster : getWekaResult()) {
 			System.out.println("Cluster " + clusterCounter);
+			System.out.println("Number of Instances:  " + cluster.size());
 			int numberOfAttributes = getWekaResult().get(0).numAttributes();
 			for (int i = 0; i < numberOfAttributes; i++) {
 				System.out.println(getAttributeAnalysis(cluster.attribute(i), cluster));

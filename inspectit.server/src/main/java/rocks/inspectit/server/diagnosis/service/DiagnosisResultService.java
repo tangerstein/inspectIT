@@ -73,9 +73,8 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	@Override
 	public synchronized void onNewDiagnosisResult(Collection<ProblemOccurrence> problemOccurrences) {
 		Properties properties = System.getProperties();
-		int clusterThreshold = Integer.parseInt(properties.getProperty("clusterThreshold"));
+		int clusterThreshold = Integer.parseInt(properties.getProperty("clusteringThreshold", "100"));
 		for (ProblemOccurrence po : problemOccurrences) {
-			log.info("Neue Instanz");
 			long rootId = po.getRequestRoot().getInvocationId();
 
 			long problemId = po.getProblemContext().getInvocationId();
@@ -147,16 +146,35 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			instance.setValue(attributes.get(5), (Double) instanceData[5]);
 			instances.add(instance);
 		}
-		// ClusterEngine starts in new Thread
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ClusterEngine cEngine = new ClusterEngine();
-				log.debug("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
-				cEngine.createClusterResult(DiagnosisResultService.this.instances,
-						new Double[] { 1., 1., 1., 1., 1., 1. }, 5).print();
-			}
-		}).start();
+		Properties properties = System.getProperties();
+		String clusteringType = properties.getProperty("clusteringType", "k");
+		if (clusteringType.equals("k")) {
+			// ClusterEngine starts in new Thread
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					log.info("------k-Means with k-estimation:------");
+					ClusterEngine cEngine = new ClusterEngine();
+					log.info("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
+					cEngine.clusterOptimizedKMeans(instances, new Double[] { 1., 1., 1., 1., 1., 1. }).print();
+				}
+			}).start();
+		} else if (clusteringType.equals("h")) {
+			// ClusterEngine starts in new Thread
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					log.info("------Hierarchical Clustering:------");
+					ClusterEngine cEngine = new ClusterEngine();
+					log.info("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
+					cEngine.createClusterResult(instances, new Double[] { 1., 1., 1., 1., 1., 1. },
+							Integer.parseInt(properties.getProperty("level", "4"))).print();
+					;
+				}
+			}).start();
+		} else {
+			log.warn("You have typed in a wrong clusteringType");
+		}
 	}
 
 	@Override
