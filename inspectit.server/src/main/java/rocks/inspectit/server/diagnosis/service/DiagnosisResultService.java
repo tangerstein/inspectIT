@@ -28,7 +28,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	/**
 	 * Number of problems, at which the clustering will be triggered.
 	 */
-	private static final int CLUSTER_THRESHOLD = 20;
+	private static final int CLUSTER_THRESHOLD = 10000;
 	/**
 	 * List of instances.
 	 */
@@ -85,12 +85,27 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	public synchronized void onNewDiagnosisResult(Collection<ProblemOccurrence> problemOccurrences) {
 		for (ProblemOccurrence po : problemOccurrences) {
 			log.info("Neue Instanz");
+			// Root invocation sequence ID
 			long rootId = po.getRequestRoot().getInvocationId();
-
+			// The problem invocation sequence ID
 			long problemId = po.getProblemContext().getInvocationId();
 			InvocationSequenceData template = new InvocationSequenceData();
 			template.setId(rootId);
-			InvocationSequenceData invocationRootNode = accessService.getInvocationSequenceDetail(template);
+			InvocationSequenceData invocationRootNode = null;
+			while (invocationRootNode == null) {
+				// for (int i = 0; i > 5000; i = i + 100) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				invocationRootNode = accessService.getInvocationSequenceDetail(template);
+				if (invocationRootNode != null) {
+					break;
+				}
+			}
+
 			if (invocationRootNode != null) {
 				InvocationSequenceData invocationNode = null;
 				ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
@@ -186,8 +201,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			public void run() {
 				ClusterEngine cEngine = new ClusterEngine();
 				log.debug("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
-				cEngine.createClusterResult(DiagnosisResultService.this.instances,
-						new Double[] { 1., 1., 1., 1., 1., 1. }, 5).print();
+				cEngine.clusterOptimizedKMeans(instances, new Double[] { 1., 1., 1., 1., 1., 1. }).print();
 			}
 		}).start();
 	}

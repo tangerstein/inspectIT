@@ -8,7 +8,7 @@ import javax.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import rocks.inspectit.server.diagnosis.service.IDiagnosisService;
-import rocks.inspectit.server.processor.AbstractCmrDataProcessor;
+import rocks.inspectit.server.processor.AbstractChainedCmrDataProcessor;
 import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
@@ -16,7 +16,7 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
  * @author Claudio Waldvogel
  *
  */
-public class DiagnosisCmrProcessor extends AbstractCmrDataProcessor {
+public class DiagnosisCmrProcessor extends AbstractChainedCmrDataProcessor {
 
 	@Autowired
 	private IDiagnosisService diagnosisService;
@@ -41,6 +41,11 @@ public class DiagnosisCmrProcessor extends AbstractCmrDataProcessor {
 	@Override
 	public boolean canBeProcessed(DefaultData defaultData) {
 		return defaultData instanceof InvocationSequenceData && ((InvocationSequenceData) defaultData).getDuration() > baseline;
+	}
+
+	@Override
+	protected boolean shouldBePassedToChainedProcessors(DefaultData defaultData) {
+		return defaultData instanceof InvocationSequenceData;
 	}
 
 }
