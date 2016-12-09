@@ -93,7 +93,6 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			template.setId(rootId);
 			InvocationSequenceData invocationRootNode = null;
 			while (invocationRootNode == null) {
-				// for (int i = 0; i > 5000; i = i + 100) {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -101,51 +100,43 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 					e.printStackTrace();
 				}
 				invocationRootNode = accessService.getInvocationSequenceDetail(template);
-				if (invocationRootNode != null) {
+			}
+
+			InvocationSequenceData invocationNode = null;
+			ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
+			invocationQueue.add(invocationRootNode);
+			while (!invocationQueue.isEmpty()) {
+				InvocationSequenceData node = invocationQueue.poll();
+				if (node.getId() == problemId) {
+					invocationNode = node;
+					log.info("Invocation found!! -- Party :)");
 					break;
+				} else {
+					invocationQueue.addAll(node.getNestedSequences());
 				}
 			}
-
-			if (invocationRootNode != null) {
-				InvocationSequenceData invocationNode = null;
-				ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
-				invocationQueue.add(invocationRootNode);
-				while (!invocationQueue.isEmpty()) {
-					InvocationSequenceData node = invocationQueue.poll();
-					if (node.getId() == problemId) {
-						invocationNode = node;
-						log.info("Invocation found!! -- Party :)");
-						break;
-					} else {
-						invocationQueue.addAll(node.getNestedSequences());
-					}
-				}
-				if (invocationNode == null) {
-					log.warn("InvocationSequence not found!");
-				}
-				Double exclusiveDuration = invocationNode.getDuration();
-
-				String rootCause = po.getRootCause().getMethodIdent() + "";
-				rootCauses.add(rootCause);
-
-				String nodeType = po.getCauseStructure().getCauseType().name();
-				nodeTypes.add(nodeType);
-
-				String problemContext = po.getProblemContext().getMethodIdent() + "";
-				problemContexts.add(problemContext);
-
-				String entryPoint = po.getRequestRoot().getMethodIdent() + "";
-				entryPoints.add(entryPoint);
-
-				String globalContext = po.getGlobalContext().getMethodIdent() + "";
-				globalContexts.add(globalContext);
-
-				instancesList.add(new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType,
-						exclusiveDuration });
-			} else {
-				log.info("Root that is null: " + rootId + "");
+			if (invocationNode == null) {
+				log.warn("InvocationSequence not found!");
 			}
+			Double exclusiveDuration = invocationNode.getDuration();
 
+			String rootCause = po.getRootCause().getMethodIdent() + "";
+			rootCauses.add(rootCause);
+
+			String nodeType = po.getCauseStructure().getCauseType().name();
+			nodeTypes.add(nodeType);
+
+			String problemContext = po.getProblemContext().getMethodIdent() + "";
+			problemContexts.add(problemContext);
+
+			String entryPoint = po.getRequestRoot().getMethodIdent() + "";
+			entryPoints.add(entryPoint);
+
+			String globalContext = po.getGlobalContext().getMethodIdent() + "";
+			globalContexts.add(globalContext);
+
+			instancesList.add(
+					new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType, exclusiveDuration });
 		}
 
 		log.debug("NumberOfInstances: " + instancesList.size());
