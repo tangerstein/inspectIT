@@ -3,7 +3,7 @@ package rocks.inspectit.server.diagnosis.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.diagnosis.categorization.clustering.ClusterEngine;
 import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence;
-import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.server.property.PropertyManager;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import weka.core.Attribute;
@@ -25,10 +25,8 @@ import weka.core.Instances;
  */
 @Component
 public class DiagnosisResultService implements IDiagnosisResultNotificationService {
-	/**
-	 * Number of problems, at which the clustering will be triggered.
-	 */
-	private static final int CLUSTER_THRESHOLD = 10000;
+	@Autowired
+	PropertyManager propertyManager;
 	/**
 	 * List of instances.
 	 */
@@ -73,24 +71,16 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onNewDiagnosisResult(ProblemOccurrence problemOccurrence) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public synchronized void onNewDiagnosisResult(Collection<ProblemOccurrence> problemOccurrences) {
+		Properties properties = System.getProperties();
+		int clusterThreshold = Integer.parseInt(properties.getProperty("clusteringThreshold", "100"));
 		for (ProblemOccurrence po : problemOccurrences) {
-			log.info("Neue Instanz");
 			// Root invocation sequence ID
 			long rootId = po.getRequestRoot().getInvocationId();
 			// The problem invocation sequence ID
 			long problemId = po.getProblemContext().getInvocationId();
-			InvocationSequenceData template = new InvocationSequenceData();
-			template.setId(rootId);
+
+			Double exclusiveDuration = po.getResponseTime();
 			InvocationSequenceData invocationRootNode = null;
 			while (invocationRootNode == null) {
 				try {
@@ -102,23 +92,23 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 				invocationRootNode = accessService.getInvocationSequenceDetail(template);
 			}
 
-			InvocationSequenceData invocationNode = null;
-			ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
-			invocationQueue.add(invocationRootNode);
-			while (!invocationQueue.isEmpty()) {
-				InvocationSequenceData node = invocationQueue.poll();
-				if (node.getId() == problemId) {
-					invocationNode = node;
-					log.info("Invocation found!! -- Party :)");
-					break;
-				} else {
-					invocationQueue.addAll(node.getNestedSequences());
+				InvocationSequenceData invocationNode = null;
+				ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
+				invocationQueue.add(invocationRootNode);
+				while (!invocationQueue.isEmpty()) {
+					InvocationSequenceData node = invocationQueue.poll();
+					if (node.getId() == problemId) {
+						invocationNode = node;
+						log.info("Invocation found!! -- Party :)");
+						break;
+					} else {
+						invocationQueue.addAll(node.getNestedSequences());
+					}
 				}
-			}
-			if (invocationNode == null) {
-				log.warn("InvocationSequence not found!");
-			}
-			Double exclusiveDuration = invocationNode.getDuration();
+				if (invocationNode == null) {
+					log.warn("InvocationSequence not found!");
+				}
+				Double exclusiveDuration = invocationNode.getDuration();
 
 			String rootCause = po.getRootCause().getMethodIdent() + "";
 			rootCauses.add(rootCause);
@@ -137,11 +127,8 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 
 			instancesList.add(
 					new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType, exclusiveDuration });
-		}
 
-		log.debug("NumberOfInstances: " + instancesList.size());
-
-		if (instancesList.size() >= CLUSTER_THRESHOLD) {
+		if (instancesList.size() >= clusterThreshold) {
 			ArrayList<Object[]> instancesListCopy = new ArrayList<Object[]>(instancesList);
 			triggerClustering(instancesListCopy);
 			instancesList.clear();
@@ -186,15 +173,41 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			instance.setValue(attributes.get(5), (Double) instanceData[5]);
 			instances.add(instance);
 		}
-		// ClusterEngine starts in new Thread
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				ClusterEngine cEngine = new ClusterEngine();
-				log.debug("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
+		Properties properties = System.getProperties();
+		String clusteringType = properties.getProperty("clusteringType", "k");
+		if (clusteringType.equals("k")) {
+			// ClusterEngine starts in new Thread
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					log.info("------k-Means with k-estimation:------");
+					ClusterEngine cEngine = new ClusterEngine();
+					log.info("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
 				cEngine.clusterOptimizedKMeans(instances, new Double[] { 1., 1., 1., 1., 1., 1. }).print();
-			}
-		}).start();
+				}
+			}).start();
+		} else if (clusteringType.equals("h")) {
+			// ClusterEngine starts in new Thread
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					log.info("------Hierarchical Clustering:------");
+					ClusterEngine cEngine = new ClusterEngine();
+					log.info("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
+					cEngine.createClusterResult(instances, new Double[] { 1., 1., 1., 1., 1., 1. },
+							Integer.parseInt(properties.getProperty("level", "4"))).print();
+					;
+				}
+			}).start();
+		} else {
+			log.warn("You have typed in a wrong clusteringType");
+		}
+	}
+
+	@Override
+	public void onNewDiagnosisResult(ProblemOccurrence problemOccurrence) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

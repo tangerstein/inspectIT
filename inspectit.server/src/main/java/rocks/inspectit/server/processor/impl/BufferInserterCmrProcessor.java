@@ -41,9 +41,6 @@ public class BufferInserterCmrProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	protected void processData(DefaultData defaultData, EntityManager entityManager) {
-		if (defaultData instanceof InvocationSequenceData) {
-			log.info(defaultData.getId() + "");
-		}
 		buffer.put(new BufferElement<MethodSensorData>((MethodSensorData) defaultData));
 	}
 

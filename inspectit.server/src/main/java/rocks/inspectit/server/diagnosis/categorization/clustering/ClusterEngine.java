@@ -69,7 +69,7 @@ public class ClusterEngine {
 			hierarchicClusterer.buildClusterer(newData);
 
 			result = hierarchicClusterer.toString();
-			System.out.println(result);
+			// System.out.println(result);
 			//
 			// Matcher m = Pattern.compile("\(([^]+)]]\)").matcher(result);
 			//

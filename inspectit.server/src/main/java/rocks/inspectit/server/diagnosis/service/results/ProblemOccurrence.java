@@ -18,6 +18,7 @@ public class ProblemOccurrence {
 	private InvocationIdentifier problemContext;
 	private RootCause rootCause;
 	private CauseStructure causeStructure;
+	private double responseTime;
 
 	/**
 	 * Default constructor.
@@ -32,17 +33,20 @@ public class ProblemOccurrence {
 	 * @param rootCause
 	 * @param causeStructure
 	 */
-	public ProblemOccurrence(InvocationIdentifier requestRoot, InvocationIdentifier globalContext, InvocationIdentifier problemContext, RootCause rootCause, CauseStructure causeStructure) {
+	public ProblemOccurrence(InvocationIdentifier requestRoot, InvocationIdentifier globalContext,
+			InvocationIdentifier problemContext, RootCause rootCause, CauseStructure causeStructure,
+			double responseTime) {
 		super();
 		this.requestRoot = requestRoot;
 		this.globalContext = globalContext;
 		this.problemContext = problemContext;
 		this.rootCause = rootCause;
 		this.causeStructure = causeStructure;
+		this.responseTime = responseTime;
 	}
 
 	public ProblemOccurrence(InvocationSequenceData requestRoot, InvocationSequenceData globalContext, InvocationSequenceData problemContext, AggregatedInvocationSequenceData rootCause,
-			CauseStructure causeStructure) {
+			CauseStructure causeStructure, double responseTime) {
 		this.requestRoot = new InvocationIdentifier(requestRoot.getMethodIdent(), requestRoot.getId());
 		this.globalContext = new InvocationIdentifier(globalContext.getMethodIdent(), globalContext.getId());
 		this.problemContext = new InvocationIdentifier(problemContext.getMethodIdent(), problemContext.getId());
@@ -58,6 +62,15 @@ public class ProblemOccurrence {
 			this.rootCause.getInvocationIds().add(invocation.getId());
 		}
 		this.causeStructure = causeStructure;
+		this.responseTime = responseTime;
+	}
+
+	public double getResponseTime() {
+		return responseTime;
+	}
+
+	public void setResponseTime(double responseTime) {
+		this.responseTime = responseTime;
 	}
 
 	/**

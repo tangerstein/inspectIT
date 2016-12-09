@@ -33,7 +33,7 @@ public class ProblemInstanceResultCollector implements ISessionResultCollector<I
 		Collection<Tag> leafTags = sessionContext.getStorage().mapTags(TagState.LEAF).values();
 		for (Tag leafTag : leafTags) {
 			ProblemOccurrence problem = new ProblemOccurrence(inputInvocationSequence, getGlobalContext(leafTag), getProblemContext(leafTag), getRootCauseInvocations(leafTag),
-					getCauseStructure(leafTag));
+					getCauseStructure(leafTag), inputInvocationSequence.getDuration());
 			problems.add(problem);
 		}
 		return problems;
