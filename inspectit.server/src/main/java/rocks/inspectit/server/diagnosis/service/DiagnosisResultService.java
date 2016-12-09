@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.diagnosis.categorization.clustering.ClusterEngine;
 import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence;
-import rocks.inspectit.server.property.PropertyManager;
+import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import weka.core.Attribute;
@@ -25,8 +26,6 @@ import weka.core.Instances;
  */
 @Component
 public class DiagnosisResultService implements IDiagnosisResultNotificationService {
-	@Autowired
-	PropertyManager propertyManager;
 	/**
 	 * List of instances.
 	 */
@@ -80,7 +79,6 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			// The problem invocation sequence ID
 			long problemId = po.getProblemContext().getInvocationId();
 
-			Double exclusiveDuration = po.getResponseTime();
 			InvocationSequenceData invocationRootNode = null;
 			while (invocationRootNode == null) {
 				try {
@@ -89,6 +87,8 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				InvocationSequenceData template = new InvocationSequenceData();
+				template.setId(rootId);
 				invocationRootNode = accessService.getInvocationSequenceDetail(template);
 			}
 
@@ -135,7 +135,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 		}
 
 	}
-
+	}
 	/**
 	 * Starts the cluster engine in a new thread and converts the stored.
 	 * instances into the WEKA- instances objects
@@ -196,7 +196,6 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 					log.info("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
 					cEngine.createClusterResult(instances, new Double[] { 1., 1., 1., 1., 1., 1. },
 							Integer.parseInt(properties.getProperty("level", "4"))).print();
-					;
 				}
 			}).start();
 		} else {
