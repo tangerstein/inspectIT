@@ -25,7 +25,7 @@ public class ClusterEngine {
 	 * Configuration of the hierarchical clusterer and the distance function.
 	 */
 	// TODO: Array statt String + Kommentar erweitern
-	private static final String HIERARCHICAL_CLUSTERER_CONFIG = "-N 1 -L SINGLE -P -A \"weka.core.EuclideanDistance -R first-5\"";
+	private static final String HIERARCHICAL_CLUSTERER_CONFIG = "-N 1 -L SINGLE -P -A \"weka.core.EuclideanDistance -R first-7\"";
 
 	/**
 	 * Configuration of the EM Clusterer.
@@ -276,7 +276,8 @@ public class ClusterEngine {
 	}
 
 	/**
-	 * Creates a clusterList, based on the given inputs.
+	 * Creates a clusterList, based on the given inputs.(hierarchical
+	 * clustering)
 	 * 
 	 * @param instances
 	 *            the instances which will be clustered
@@ -307,7 +308,7 @@ public class ClusterEngine {
 	 *            the level, until the tree will be cut
 	 * @return {@link ClusterResult}
 	 */
-	public ClusterResult createClusterResult(Instances instances, Double[] weights, int level) {
+	public ClusterResult createClusterHierarchical(Instances instances, Double[] weights, int level) {
 		return new ClusterResult(createClusterList(instances, weights, level), weights);
 	}
 
@@ -321,7 +322,7 @@ public class ClusterEngine {
 	public static void main(String[] args) {
 		ClusterEngine clustering = new ClusterEngine();
 		Instances instances = InstancesProvider.createRandomInstances(100);
-		clustering.createClusterResult(instances, new Double[] { 1., 1., 1., 1., 1., 1. }, 5).print();
+		clustering.createClusterHierarchical(instances, new Double[] { 1., 1., 1., 1., 1., 1. }, 5).print();
 
 	}
 }

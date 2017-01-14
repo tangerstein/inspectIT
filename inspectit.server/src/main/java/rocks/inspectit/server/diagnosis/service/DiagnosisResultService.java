@@ -92,23 +92,27 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 				invocationRootNode = accessService.getInvocationSequenceDetail(template);
 			}
 
-				InvocationSequenceData invocationNode = null;
-				ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
-				invocationQueue.add(invocationRootNode);
-				while (!invocationQueue.isEmpty()) {
-					InvocationSequenceData node = invocationQueue.poll();
-					if (node.getId() == problemId) {
-						invocationNode = node;
-						log.info("Invocation found!! -- Party :)");
-						break;
-					} else {
-						invocationQueue.addAll(node.getNestedSequences());
-					}
+			InvocationSequenceData invocationNode = null;
+			ConcurrentLinkedQueue<InvocationSequenceData> invocationQueue = new ConcurrentLinkedQueue<InvocationSequenceData>();
+			invocationQueue.add(invocationRootNode);
+			while (!invocationQueue.isEmpty()) {
+				InvocationSequenceData node = invocationQueue.poll();
+				if (node.getId() == problemId) {
+					invocationNode = node;
+					log.info("Invocation found!! -- Party :)");
+					break;
+				} else {
+					invocationQueue.addAll(node.getNestedSequences());
 				}
-				if (invocationNode == null) {
-					log.warn("InvocationSequence not found!");
-				}
-				Double exclusiveDuration = invocationNode.getDuration();
+			}
+			if (invocationNode == null) {
+				log.warn("InvocationSequence not found!");
+			}
+			Double exclusiveDuration = invocationNode.getDuration();
+
+			Double depthOfInvocationTree = getDepth(invocationNode, 0) + 0.0;
+
+			Double numberOfChildren = (double) invocationNode.getNestedSequences().size();
 
 			String rootCause = po.getRootCause().getMethodIdent() + "";
 			rootCauses.add(rootCause);
@@ -126,16 +130,39 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			globalContexts.add(globalContext);
 
 			instancesList.add(
-					new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType, exclusiveDuration });
+					new Object[] { rootCause, problemContext, entryPoint, globalContext, nodeType, exclusiveDuration,
+							depthOfInvocationTree, numberOfChildren });
 
-		if (instancesList.size() >= clusterThreshold) {
-			ArrayList<Object[]> instancesListCopy = new ArrayList<Object[]>(instancesList);
-			triggerClustering(instancesListCopy);
-			instancesList.clear();
+			if (instancesList.size() >= clusterThreshold) {
+				ArrayList<Object[]> instancesListCopy = new ArrayList<Object[]>(instancesList);
+				triggerClustering(instancesListCopy);
+				instancesList.clear();
+			}
+
 		}
+	}
 
+	/**
+	 * Calculates the depth of an execution trace
+	 * 
+	 * @param invocationNode
+	 * @return the depth
+	 */
+	private Integer getDepth(InvocationSequenceData invocationNode, Integer depth) {
+		int currentdepth = 0;
+		for (InvocationSequenceData child : invocationNode.getNestedSequences()) {
+			if (child.getNestedSequences().isEmpty()) {
+				return currentdepth;
+			} else {
+				int childDepth = getDepth(child, depth + 1);
+				if (childDepth > currentdepth) {
+					currentdepth = childDepth;
+				}
+			}
+		}
+		return depth + currentdepth;
 	}
-	}
+
 	/**
 	 * Starts the cluster engine in a new thread and converts the stored.
 	 * instances into the WEKA- instances objects
@@ -150,6 +177,8 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 		Attribute entryPointAttribute = new Attribute("entryPoint", new ArrayList<String>(entryPoints));
 		Attribute globalContextAttribute = new Attribute("globalContext", new ArrayList<String>(globalContexts));
 		Attribute exclusiveDurationAttribute = new Attribute("exclusiveDuration");
+		Attribute depthAttribute = new Attribute("Depth of the the execution tree");
+		Attribute numberOfNestedSequencesAttribute = new Attribute("number of nested sequences");
 
 		ArrayList<Attribute> attributes = new ArrayList<Attribute>();
 		// Declare the feature ArrayList
@@ -159,6 +188,9 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 		attributes.add(globalContextAttribute);
 		attributes.add(nodeTypeAttribute);
 		attributes.add(exclusiveDurationAttribute);
+		attributes.add(depthAttribute);
+		attributes.add(numberOfNestedSequencesAttribute);
+
 		instances = new Instances("problemInstances", attributes, instancesList.size());
 		if (instancesList.isEmpty()) {
 			return;
@@ -171,6 +203,9 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 			instance.setValue(attributes.get(3), (String) instanceData[3]);
 			instance.setValue(attributes.get(4), (String) instanceData[4]);
 			instance.setValue(attributes.get(5), (Double) instanceData[5]);
+			instance.setValue(attributes.get(6), (Double) instanceData[6]);
+			instance.setValue(attributes.get(7), (Double) instanceData[7]);
+
 			instances.add(instance);
 		}
 		Properties properties = System.getProperties();
@@ -183,7 +218,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 					log.info("------k-Means with k-estimation:------");
 					ClusterEngine cEngine = new ClusterEngine();
 					log.info("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
-				cEngine.clusterOptimizedKMeans(instances, new Double[] { 1., 1., 1., 1., 1., 1. }).print();
+					cEngine.clusterOptimizedKMeans(instances, new Double[] { 1., 1., 1., 1., 1., 1., 1., 1. }).print();
 				}
 			}).start();
 		} else if (clusteringType.equals("h")) {
@@ -194,7 +229,7 @@ public class DiagnosisResultService implements IDiagnosisResultNotificationServi
 					log.info("------Hierarchical Clustering:------");
 					ClusterEngine cEngine = new ClusterEngine();
 					log.info("Menge der übergebenen Instanzen: " + DiagnosisResultService.this.instances.size());
-					cEngine.createClusterResult(instances, new Double[] { 1., 1., 1., 1., 1., 1. },
+					cEngine.createClusterHierarchical(instances, new Double[] { 1., 1., 1., 1., 1., 1., 1., 1., },
 							Integer.parseInt(properties.getProperty("level", "4"))).print();
 				}
 			}).start();
