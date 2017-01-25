@@ -25,9 +25,9 @@ import rocks.inspectit.server.diagnosis.engine.IDiagnosisEngine;
 import rocks.inspectit.server.diagnosis.engine.rule.annotation.Rule;
 import rocks.inspectit.server.diagnosis.engine.session.ISessionCallback;
 import rocks.inspectit.server.diagnosis.engine.session.SessionVariables;
-import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence;
 import rocks.inspectit.server.diagnosis.service.rules.RuleConstants;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
 import rocks.inspectit.shared.all.spring.logger.Log;
 
 /**
@@ -45,6 +45,9 @@ public class DiagnosisServiceImpl implements IDiagnosisService, Runnable {
 	private IDiagnosisResultNotificationService diagnosisResultService;
 
 	private IDiagnosisEngine<InvocationSequenceData> engine;
+
+	@Autowired
+	private ProblemInstanceResultCollector collector;
 
 	private final int capacity = 100;
 
@@ -121,7 +124,7 @@ public class DiagnosisServiceImpl implements IDiagnosisService, Runnable {
 
 		configuration.setNumSessionWorkers(2);
 		configuration.setRuleClasses(ruleClasses);
-		configuration.setResultCollector(new ProblemInstanceResultCollector());
+		configuration.setResultCollector(collector);
 		configuration.setSessionCallback(new DelegatingResultHandler());
 
 		engine = new DiagnosisEngine<>(configuration);

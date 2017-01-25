@@ -29,6 +29,7 @@ import org.apache.commons.lang.mutable.MutableLong;
 import org.apache.commons.lang.mutable.MutableObject;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -50,10 +51,10 @@ import rocks.inspectit.shared.cs.cmr.service.IServerStatusService;
 import rocks.inspectit.shared.cs.communication.data.cmr.WritingStatus;
 import rocks.inspectit.shared.cs.storage.IStorageData;
 import rocks.inspectit.shared.cs.storage.StorageData;
+import rocks.inspectit.shared.cs.storage.StorageData.StorageState;
 import rocks.inspectit.shared.cs.storage.StorageFileType;
 import rocks.inspectit.shared.cs.storage.StorageManager;
 import rocks.inspectit.shared.cs.storage.StorageWriter;
-import rocks.inspectit.shared.cs.storage.StorageData.StorageState;
 import rocks.inspectit.shared.cs.storage.label.AbstractStorageLabel;
 import rocks.inspectit.shared.cs.storage.processor.AbstractDataProcessor;
 import rocks.inspectit.shared.cs.storage.processor.impl.TimeFrameDataProcessor;
@@ -93,6 +94,7 @@ public class CmrStorageManager extends StorageManager implements ApplicationList
 	 * Buffer for dealing with copy from buffer action.
 	 */
 	@Autowired
+	@Qualifier("atomicBuffer")
 	IBuffer<DefaultData> buffer;
 
 	/**

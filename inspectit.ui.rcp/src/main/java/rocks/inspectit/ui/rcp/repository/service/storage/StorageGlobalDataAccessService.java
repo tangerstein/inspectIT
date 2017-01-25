@@ -21,9 +21,9 @@ import rocks.inspectit.shared.all.communication.data.JmxSensorValueData;
 import rocks.inspectit.shared.all.communication.data.cmr.AgentStatusData;
 import rocks.inspectit.shared.all.exception.BusinessException;
 import rocks.inspectit.shared.all.exception.enumeration.AgentManagementErrorCodeEnum;
+import rocks.inspectit.shared.all.indexing.restriction.impl.IndexQueryRestrictionFactory;
 import rocks.inspectit.shared.cs.cmr.service.IGlobalDataAccessService;
 import rocks.inspectit.shared.cs.indexing.query.provider.impl.StorageIndexQueryProvider;
-import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
 import rocks.inspectit.shared.cs.indexing.storage.IStorageTreeComponent;
 import rocks.inspectit.shared.cs.indexing.storage.impl.StorageIndexQuery;
 

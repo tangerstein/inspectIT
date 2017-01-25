@@ -3,6 +3,7 @@ package rocks.inspectit.server.indexing.impl;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,9 @@ import rocks.inspectit.shared.cs.indexing.indexer.impl.TimestampIndexer;
  * 
  */
 @Component
-public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
+public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>>, BeanNameAware {
+
+	public String beanname;
 
 	/**
 	 * {@inheritDoc}
@@ -35,7 +38,7 @@ public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 		BufferBranchIndexer<DefaultData> timestampIndexer = new BufferBranchIndexer<DefaultData>(new TimestampIndexer<DefaultData>());
 		BufferBranchIndexer<DefaultData> objectTypeIndexer = new BufferBranchIndexer<DefaultData>(new ObjectTypeIndexer<DefaultData>(), timestampIndexer);
 		BufferBranchIndexer<DefaultData> platformIndexer = new BufferBranchIndexer<DefaultData>(new PlatformIdentIndexer<DefaultData>(), objectTypeIndexer);
-		return new RootBranch<DefaultData>(platformIndexer);
+		return new RootBranch<DefaultData>(platformIndexer, beanname);
 	}
 
 	/**
@@ -79,14 +82,17 @@ public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 		 */
 		private Future<?> clearEmptyComponentsFuture;
 
+		public String name;
+
 		/**
 		 * Default constructor.
 		 * 
 		 * @param branchIndexer
 		 *            Branch indexer for root branch.
 		 */
-		public RootBranch(IBufferBranchIndexer<E> branchIndexer) {
+		public RootBranch(IBufferBranchIndexer<E> branchIndexer, String name) {
 			super(branchIndexer);
+			this.name = name;
 		}
 
 		/**
@@ -113,6 +119,16 @@ public class RootBranchFactory implements FactoryBean<RootBranch<DefaultData>> {
 				clearEmptyComponentsFuture = executorService.submit(clearEmptyComponentsRunnable);
 			}
 		}
+
+		public String getName() {
+			return name;
+		}
+
+	}
+
+	@Override
+	public void setBeanName(String arg0) {
+		this.beanname = arg0;
 
 	}
 

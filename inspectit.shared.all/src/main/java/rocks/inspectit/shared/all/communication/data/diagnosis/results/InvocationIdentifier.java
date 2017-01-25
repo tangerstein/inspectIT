@@ -1,14 +1,20 @@
 /**
  *
  */
-package rocks.inspectit.server.diagnosis.service.results;
+package rocks.inspectit.shared.all.communication.data.diagnosis.results;
+
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  * @author Alexander Wert
  *
  */
 public class InvocationIdentifier {
+
+	@JsonProperty(value = "methodIdent")
 	private final long methodIdent;
+
+	@JsonProperty(value = "invocationId")
 	private final long invocationId;
 
 	/**

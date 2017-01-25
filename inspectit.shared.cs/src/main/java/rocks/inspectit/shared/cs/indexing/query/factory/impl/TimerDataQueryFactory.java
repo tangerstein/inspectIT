@@ -4,12 +4,15 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.shared.all.communication.data.AggregatedTimerData;
 import rocks.inspectit.shared.all.communication.data.TimerData;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.query.factory.AbstractQueryFactory;
+import rocks.inspectit.shared.cs.indexing.query.provider.IIndexQueryProvider;
 
 /**
  * Factory for all queries for the {@link TimerData}.
@@ -20,7 +23,10 @@ import rocks.inspectit.shared.cs.indexing.query.factory.AbstractQueryFactory;
  */
 @Component
 public class TimerDataQueryFactory<E extends IIndexQuery> extends AbstractQueryFactory<E> {
-
+	@Autowired
+	public TimerDataQueryFactory(@Qualifier("indexQueryProvider") IIndexQueryProvider<E> indexQueryProvider) {
+		super.setIndexQueryProvider(indexQueryProvider);
+	}
 	/**
 	 * Returns the query for aggregating the {@link TimerData}.
 	 * 

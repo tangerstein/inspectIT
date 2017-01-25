@@ -1,5 +1,6 @@
 package rocks.inspectit.server.cache.impl;
 
+
 import rocks.inspectit.server.cache.IBuffer;
 
 /**
@@ -14,7 +15,7 @@ public abstract class BufferWorker extends Thread {
 	/**
 	 * Buffer to work on.
 	 */
-	private IBuffer<?> buffer;
+	protected IBuffer<?> buffer;
 
 	/**
 	 * Default constructor. Thread is set to be a daemon, to have highest priority and started.
@@ -26,6 +27,21 @@ public abstract class BufferWorker extends Thread {
 	 */
 	public BufferWorker(IBuffer<?> buffer, String threadName) {
 		this.buffer = buffer;
+		setName(threadName);
+		setDaemon(true);
+		setPriority(MAX_PRIORITY);
+	}
+
+	/**
+	 * Default constructor. Thread is set to be a daemon, to have highest
+	 * priority and started.
+	 * 
+	 * @param buffer
+	 *            Buffer to work on.
+	 * @param threadName
+	 *            How to name the thread.
+	 */
+	public BufferWorker(String threadName) {
 		setName(threadName);
 		setDaemon(true);
 		setPriority(MAX_PRIORITY);
@@ -44,8 +60,17 @@ public abstract class BufferWorker extends Thread {
 	 * 
 	 * @return Buffer.
 	 */
-	protected IBuffer<?> getBuffer() {
+	public IBuffer<?> getBuffer() {
 		return buffer;
+	}
+
+	/**
+	 * Sets the worker that worker is working on.
+	 * 
+	 * @return Buffer.
+	 */
+	public void setBuffer(IBuffer<?> buffer) {
+		this.buffer = buffer;
 	}
 
 	/**

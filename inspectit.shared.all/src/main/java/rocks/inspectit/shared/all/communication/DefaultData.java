@@ -13,7 +13,12 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 
+import org.codehaus.jackson.annotate.JsonSubTypes;
+import org.codehaus.jackson.annotate.JsonSubTypes.Type;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
+
 import rocks.inspectit.shared.all.cmr.cache.IObjectSizes;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 
 /**
@@ -33,6 +38,9 @@ import rocks.inspectit.shared.all.indexing.IIndexQuery;
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @NamedQuery(name = DefaultData.DELETE_FOR_PLATFORM_ID, query = "DELETE FROM DefaultData d WHERE d.platformIdent=:platformIdent")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({ @Type(name = "ProblemOccurrence", value = ProblemOccurrence.class) })
+
 public abstract class DefaultData implements Serializable, Sizeable {
 
 	/**

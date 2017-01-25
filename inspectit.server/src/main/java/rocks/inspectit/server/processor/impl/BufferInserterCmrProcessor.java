@@ -3,6 +3,7 @@ package rocks.inspectit.server.processor.impl;
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import rocks.inspectit.server.cache.IBuffer;
 import rocks.inspectit.server.cache.impl.BufferElement;
@@ -25,6 +26,7 @@ public class BufferInserterCmrProcessor extends AbstractCmrDataProcessor {
 	 * Buffer to inser elements to.
 	 */
 	@Autowired
+	@Qualifier("atomicBuffer")
 	IBuffer<MethodSensorData> buffer;
 
 	/**
@@ -32,6 +34,8 @@ public class BufferInserterCmrProcessor extends AbstractCmrDataProcessor {
 	 */
 	@Override
 	protected void processData(DefaultData defaultData, EntityManager entityManager) {
+		//System.out.println(((AtomicBuffer) buffer).name + "-> Indexer: "
+		// + ((RootBranch) ((AtomicBuffer) buffer).getIndexingTree()).name);
 		buffer.put(new BufferElement<MethodSensorData>((MethodSensorData) defaultData));
 	}
 

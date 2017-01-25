@@ -1,22 +1,44 @@
 /**
  *
  */
-package rocks.inspectit.server.diagnosis.service.results;
+package rocks.inspectit.shared.all.communication.data.diagnosis.results;
 
+
+
+
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.AggregatedInvocationSequenceData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceDataHelper;
 import rocks.inspectit.shared.all.communication.data.TimerData;
+import rocks.inspectit.shared.all.indexing.IIndexQuery;
+import rocks.inspectit.shared.all.indexing.IProblemOccurrenceIndexQuery;
 
 /**
  * @author Alexander Wert
  *
  */
-public class ProblemOccurrence {
+public class ProblemOccurrence extends DefaultData {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3470892613217620473L;
+
+	@JsonProperty(value = "requestRoot")
 	private InvocationIdentifier requestRoot;
+
+	@JsonProperty(value = "globalContext")
 	private InvocationIdentifier globalContext;
+
+	@JsonProperty(value = "problemContext")
 	private InvocationIdentifier problemContext;
+
+	@JsonProperty(value = "rootCause")
 	private RootCause rootCause;
+
+	@JsonProperty(value = "causeStructure")
 	private CauseStructure causeStructure;
 
 	/**
@@ -156,7 +178,9 @@ public class ProblemOccurrence {
 	}
 
 	public static class CauseStructure {
+		@JsonProperty(value = "causeType")
 		private CauseType causeType;
+		@JsonProperty(value = "depth")
 		private int depth;
 
 		/**
@@ -207,10 +231,101 @@ public class ProblemOccurrence {
 			this.depth = depth;
 		}
 
+
+
 	}
+
+	/**
+	 * {@inheritDoc} TODO: CauseStructure is missing due to visibility reasons
+	 */
+	public boolean isQueryComplied(IIndexQuery query) {
+		if (!super.isQueryComplied(query)) {
+			return false;
+		}
+		if (query instanceof IProblemOccurrenceIndexQuery) {
+			IProblemOccurrenceIndexQuery problemOccurrenceQuery = (IProblemOccurrenceIndexQuery) query;
+			if (problemOccurrenceQuery.getGlobalContextId() != 0
+					& problemOccurrenceQuery.getGlobalContextId() != this.getGlobalContext().getInvocationId()) {
+				return false;
+			}
+			if (problemOccurrenceQuery.getProblemContextId() != 0
+					& problemOccurrenceQuery.getProblemContextId() != this.getProblemContext().getInvocationId()) {
+				return false;
+			}
+			if (problemOccurrenceQuery.getRequestRootID() != 0
+					& problemOccurrenceQuery.getRequestRootID() != this.getRequestRoot().getInvocationId()) {
+				return false;
+			}
+			if (problemOccurrenceQuery.getRootCauseId() != 0
+					& this.getRootCause().getInvocationIds().contains(problemOccurrenceQuery.getRootCauseId())) {
+				return false;
+			}
+		}
+		return true;
+
+	}
+
+
 
 	public static enum CauseType {
 		SINGLE, ITERATIVE, RECURSIVE
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		ProblemOccurrence other = (ProblemOccurrence) obj;
+		if (getId() != other.getId()) {
+			return false;
+		}
+		if (getPlatformIdent() != other.getPlatformIdent()) {
+			return false;
+		}
+		if (getSensorTypeIdent() != other.getSensorTypeIdent()) {
+			return false;
+		}
+		if (getTimeStamp() == null) {
+			if (other.getTimeStamp() != null) {
+				return false;
+			}
+		} else if (!getTimeStamp().equals(other.getTimeStamp())) {
+			return false;
+		}
+		if (!(globalContext.equals(other.getGlobalContext()))) {
+			return false;
+		}
+		if (!(problemContext.equals(other.getProblemContext()))) {
+			return false;
+		}
+		if (!(requestRoot.equals(other.getRequestRoot()))) {
+			return false;
+		}
+		if (!(rootCause.equals(other.getRootCause()))) {
+			return false;
+		}
+		if (!(causeStructure.equals(other.getCauseStructure()))) {
+			return false;
+		}
+		return true;
+	}
+
+
+	public int hashcode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((globalContext == null) ? 0 : globalContext.hashCode());
+		result = prime * result + ((problemContext == null) ? 0 : problemContext.hashCode());
+		result = prime * result + ((requestRoot == null) ? 0 : requestRoot.hashCode());
+		result = prime * result + ((rootCause == null) ? 0 : rootCause.hashCode());
+		result = prime * result + ((causeStructure == null) ? 0 : causeStructure.hashCode());
+		return result;
 	}
 
 }

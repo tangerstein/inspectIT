@@ -2,7 +2,6 @@ package rocks.inspectit.server.cache.impl;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.server.cache.IBuffer;
@@ -22,9 +21,8 @@ public class BufferEvictor extends BufferWorker {
 	 * @param buffer
 	 *            Buffer to work on.
 	 */
-	@Autowired
-	public BufferEvictor(IBuffer<?> buffer) {
-		super(buffer, "buffer-evicting-thread");
+	public BufferEvictor() {
+		super("buffer-evicting-thread");
 	}
 
 	/**

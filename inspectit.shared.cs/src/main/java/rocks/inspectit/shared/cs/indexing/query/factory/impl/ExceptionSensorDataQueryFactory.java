@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.shared.all.communication.ExceptionEvent;
@@ -11,6 +13,7 @@ import rocks.inspectit.shared.all.communication.data.AggregatedExceptionSensorDa
 import rocks.inspectit.shared.all.communication.data.ExceptionSensorData;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.query.factory.AbstractQueryFactory;
+import rocks.inspectit.shared.cs.indexing.query.provider.IIndexQueryProvider;
 import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
 
 /**
@@ -22,7 +25,10 @@ import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestriction
  */
 @Component
 public class ExceptionSensorDataQueryFactory<E extends IIndexQuery> extends AbstractQueryFactory<E> {
-
+	@Autowired
+	public ExceptionSensorDataQueryFactory(@Qualifier("indexQueryProvider") IIndexQueryProvider<E> indexQueryProvider) {
+		super.setIndexQueryProvider(indexQueryProvider);
+	}
 	/**
 	 * Returns a query for a list of {@link ExceptionSensorData} objects which are between the from
 	 * and to {@link Date} objects. This list can be used to get an overview over recorded

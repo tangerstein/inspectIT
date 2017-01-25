@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.query.factory.AbstractQueryFactory;
+import rocks.inspectit.shared.cs.indexing.query.provider.IIndexQueryProvider;
 import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
 
 /**
@@ -21,7 +24,11 @@ import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestriction
  */
 @Component
 public class InvocationSequenceDataQueryFactory<E extends IIndexQuery> extends AbstractQueryFactory<E> {
-
+	@Autowired
+	public InvocationSequenceDataQueryFactory(
+			@Qualifier("indexQueryProvider") IIndexQueryProvider<E> indexQueryProvider) {
+		super.setIndexQueryProvider(indexQueryProvider);
+	}
 	/**
 	 * Returns query for invocation overview.
 	 * 

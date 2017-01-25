@@ -1,10 +1,13 @@
 /**
  *
  */
-package rocks.inspectit.server.diagnosis.service.results;
+package rocks.inspectit.shared.all.communication.data.diagnosis.results;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import rocks.inspectit.shared.all.communication.data.TimerData;
 
@@ -13,9 +16,12 @@ import rocks.inspectit.shared.all.communication.data.TimerData;
  *
  */
 public class RootCause {
+	@JsonProperty(value = "methodIdent")
 	private final long methodIdent;
+	@JsonIgnore
 	private final TimerData timerData;
-	private final List<Long> invocationIds = new ArrayList<>();
+	@JsonProperty(value = "InvocationIds")
+	private final List<Long> invocationIds = new ArrayList<Long>();
 
 	/**
 	 * @param methodIdent

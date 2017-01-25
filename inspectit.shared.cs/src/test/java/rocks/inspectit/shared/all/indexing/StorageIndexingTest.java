@@ -1,4 +1,4 @@
-package rocks.inspectit.shared.cs.indexing.impl;
+package rocks.inspectit.shared.all.indexing;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;

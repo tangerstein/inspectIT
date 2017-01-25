@@ -8,13 +8,13 @@ import java.util.Stack;
 import rocks.inspectit.server.diagnosis.engine.rule.annotation.Action;
 import rocks.inspectit.server.diagnosis.engine.rule.annotation.Rule;
 import rocks.inspectit.server.diagnosis.engine.rule.annotation.TagValue;
-import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence.CauseStructure;
-import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence.CauseType;
 import rocks.inspectit.server.diagnosis.service.rules.InvocationSequenceDataIterator;
 import rocks.inspectit.server.diagnosis.service.rules.RuleConstants;
 import rocks.inspectit.shared.all.communication.data.AggregatedInvocationSequenceData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceDataHelper;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence.CauseStructure;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence.CauseType;
 
 /**
  * @author Alexander Wert

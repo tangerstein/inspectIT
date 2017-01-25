@@ -7,22 +7,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import rocks.inspectit.server.diagnosis.engine.session.ISessionResultCollector;
 import rocks.inspectit.server.diagnosis.engine.session.SessionContext;
 import rocks.inspectit.server.diagnosis.engine.tag.Tag;
 import rocks.inspectit.server.diagnosis.engine.tag.TagState;
-import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence;
-import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence.CauseStructure;
 import rocks.inspectit.server.diagnosis.service.rules.RuleConstants;
+import rocks.inspectit.server.util.CacheIdGenerator;
 import rocks.inspectit.shared.all.communication.data.AggregatedInvocationSequenceData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence.CauseStructure;
 
 /**
  * @author Alexander Wert
  *
  */
+@Component
 public class ProblemInstanceResultCollector implements ISessionResultCollector<InvocationSequenceData, List<ProblemOccurrence>> {
-
+	@Autowired
+	CacheIdGenerator cacheIdGenerator;
 	/**
 	 * {@inheritDoc}
 	 */
@@ -34,6 +40,12 @@ public class ProblemInstanceResultCollector implements ISessionResultCollector<I
 		for (Tag leafTag : leafTags) {
 			ProblemOccurrence problem = new ProblemOccurrence(inputInvocationSequence, getGlobalContext(leafTag), getProblemContext(leafTag), getRootCauseInvocations(leafTag),
 					getCauseStructure(leafTag));
+			// Problem gets an ID
+			cacheIdGenerator.assignObjectAnId(problem);
+			//TODO überlegen, was man hier wirklich setzen will (invocs sind vermutlich noch nicht im Buffer)
+			problem.setPlatformIdent(inputInvocationSequence.getPlatformIdent());
+			problem.setTimeStamp(inputInvocationSequence.getTimeStamp());
+			problem.setSensorTypeIdent(inputInvocationSequence.getSensorTypeIdent());
 			problems.add(problem);
 		}
 		return problems;

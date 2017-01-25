@@ -4,12 +4,15 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.shared.all.communication.data.AggregatedSqlStatementData;
 import rocks.inspectit.shared.all.communication.data.SqlStatementData;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.query.factory.AbstractQueryFactory;
+import rocks.inspectit.shared.cs.indexing.query.provider.IIndexQueryProvider;
 import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
 
 /**
@@ -21,7 +24,10 @@ import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestriction
  */
 @Component
 public class SqlStatementDataQueryFactory<E extends IIndexQuery> extends AbstractQueryFactory<E> {
-
+	@Autowired
+	public SqlStatementDataQueryFactory(@Qualifier("indexQueryProvider") IIndexQueryProvider<E> indexQueryProvider) {
+		super.setIndexQueryProvider(indexQueryProvider);
+	}
 	/**
 	 * Returns the query for aggregating the {@link SqlStatementData}. If the template holds the SQL
 	 * query string, only objects with this query string will be returned.

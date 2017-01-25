@@ -169,8 +169,8 @@ public class IndexingTreePerfTest {
 		};
 
 		// timer data
-		TimerDataQueryFactory<IndexQuery> timerDataQueryFactory = new TimerDataQueryFactory<IndexQuery>();
-		timerDataQueryFactory.setIndexQueryProvider(indexQueryProvider);
+		TimerDataQueryFactory<IndexQuery> timerDataQueryFactory = new TimerDataQueryFactory<IndexQuery>(
+				indexQueryProvider);
 
 		aggregatedTimerDataQuery = timerDataQueryFactory.getAggregatedTimerDataQuery(new TimerData(null, platformIdent, 0, 0), null, null);
 		aggregatedTimerDataQueryMethod = timerDataQueryFactory.getAggregatedTimerDataQuery(new TimerData(null, platformIdent, 0, methodIdent), null, null);
@@ -189,8 +189,8 @@ public class IndexingTreePerfTest {
 		aggregatedTimerDataQuery15MinsTimeframe = timerDataQueryFactory.getAggregatedTimerDataQuery(new TimerData(null, platformIdent, 0, 0), fromDate, toDate);
 
 		// invocation data
-		InvocationSequenceDataQueryFactory<IndexQuery> invocationSequenceDataQueryFactory = new InvocationSequenceDataQueryFactory<IndexQuery>();
-		invocationSequenceDataQueryFactory.setIndexQueryProvider(indexQueryProvider);
+		InvocationSequenceDataQueryFactory<IndexQuery> invocationSequenceDataQueryFactory = new InvocationSequenceDataQueryFactory<IndexQuery>(
+				indexQueryProvider);
 
 		invocationOverviewQuery = invocationSequenceDataQueryFactory.getInvocationSequenceOverview(platformIdent, 0, 0, null, null);
 	}

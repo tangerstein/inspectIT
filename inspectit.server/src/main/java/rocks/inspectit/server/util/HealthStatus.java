@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -84,6 +85,7 @@ public class HealthStatus {
 	 * Buffer that reports status.
 	 */
 	@Autowired
+	@Qualifier("atomicBuffer")
 	private IBuffer<?> buffer;
 
 	/**

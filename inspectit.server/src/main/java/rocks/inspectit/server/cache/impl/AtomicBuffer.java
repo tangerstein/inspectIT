@@ -15,6 +15,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,7 @@ import rocks.inspectit.shared.cs.indexing.buffer.IBufferTreeComponent;
  *            Parameterized type of elements buffer can hold.
  */
 @Component
-public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
+public class AtomicBuffer<E extends DefaultData> implements IBuffer<E>, BeanNameAware {
 
 	/** The logger of this class. */
 	@Log
@@ -59,8 +60,15 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	/**
 	 * Indexing tree where the elements will be indexed.
 	 */
-	@Autowired
 	IBufferTreeComponent<E> indexingTree;
+
+	public IBufferTreeComponent<E> getIndexingTree() {
+		return indexingTree;
+	}
+
+	public void setIndexingTree(IBufferTreeComponent<E> indexingTree) {
+		this.indexingTree = indexingTree;
+	}
 
 	/**
 	 * Atomic reference to the first object.
@@ -201,6 +209,8 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 	 */
 	private IndexBufferElementProcessor<E> indexProcessor;
 
+	public String name;
+
 	/**
 	 * Default constructor.
 	 */
@@ -332,6 +342,7 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 				// change the last element to the right one
 				// only thread that execute compare and set successfully can perform changes
 				if (last.compareAndSet(currentLastElement, newLastElement)) {
+					log.warn(currentLastElement.getObject().getClass() + "");
 					// subtract the fragment size
 					substractFromCurrentSize(fragmentSize);
 
@@ -728,6 +739,12 @@ public class AtomicBuffer<E extends DefaultData> implements IBuffer<E> {
 		@Override
 		public void setBufferElementState(rocks.inspectit.server.cache.IBufferElement.BufferElementState bufferElementState) {
 		}
+
+	}
+
+	@Override
+	public void setBeanName(String arg0) {
+		this.name = arg0;
 
 	}
 }

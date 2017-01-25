@@ -98,14 +98,9 @@ public class CachingWriteDataProcessorProvider {
 	 */
 	@PostConstruct
 	public void initFactories() {
-		timerDataQueryFactory = new TimerDataQueryFactory<>();
-		timerDataQueryFactory.setIndexQueryProvider(storageIndexQueryProvider);
-
-		sqlStatementDataQueryFactory = new SqlStatementDataQueryFactory<>();
-		sqlStatementDataQueryFactory.setIndexQueryProvider(storageIndexQueryProvider);
-
-		exceptionSensorDataQueryFactory = new ExceptionSensorDataQueryFactory<>();
-		exceptionSensorDataQueryFactory.setIndexQueryProvider(storageIndexQueryProvider);
+		timerDataQueryFactory = new TimerDataQueryFactory<>(storageIndexQueryProvider);
+		sqlStatementDataQueryFactory = new SqlStatementDataQueryFactory<>(storageIndexQueryProvider);
+		exceptionSensorDataQueryFactory = new ExceptionSensorDataQueryFactory<>(storageIndexQueryProvider);
 	}
 
 }

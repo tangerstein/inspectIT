@@ -5,8 +5,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import rocks.inspectit.server.dao.ExceptionSensorDataDao;
@@ -16,6 +18,7 @@ import rocks.inspectit.shared.all.communication.data.ExceptionSensorData;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.AbstractBranch;
 import rocks.inspectit.shared.cs.indexing.aggregation.Aggregators;
+import rocks.inspectit.shared.cs.indexing.buffer.IBufferTreeComponent;
 import rocks.inspectit.shared.cs.indexing.query.factory.impl.ExceptionSensorDataQueryFactory;
 
 /**
@@ -28,7 +31,7 @@ import rocks.inspectit.shared.cs.indexing.query.factory.impl.ExceptionSensorData
  * 
  */
 @Repository
-public class BufferExceptionSensorDataDaoImpl extends AbstractBufferDataDao<ExceptionSensorData> implements ExceptionSensorDataDao {
+public class BufferExceptionSensorDataDaoImpl extends DefaultBufferDataDao<ExceptionSensorData> implements ExceptionSensorDataDao {
 
 	/**
 	 * Index query provider.
@@ -41,6 +44,13 @@ public class BufferExceptionSensorDataDaoImpl extends AbstractBufferDataDao<Exce
 	 */
 	public List<ExceptionSensorData> getUngroupedExceptionOverview(ExceptionSensorData template, int limit, Comparator<? super ExceptionSensorData> comparator) {
 		return this.getUngroupedExceptionOverview(template, limit, null, null, comparator);
+	}
+
+	@Autowired
+	public BufferExceptionSensorDataDaoImpl(
+			@Qualifier("indexingTree") IBufferTreeComponent<ExceptionSensorData> indexingTree,
+			@Qualifier("indexingTreeForkJoinPool") ForkJoinPool forkJoinPool) {
+		super(indexingTree, forkJoinPool);
 	}
 
 	/**

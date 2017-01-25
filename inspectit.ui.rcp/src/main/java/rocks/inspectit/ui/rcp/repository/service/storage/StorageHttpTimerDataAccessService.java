@@ -12,11 +12,11 @@ import org.apache.commons.collections.CollectionUtils;
 
 import rocks.inspectit.shared.all.communication.data.HttpInfo;
 import rocks.inspectit.shared.all.communication.data.HttpTimerData;
+import rocks.inspectit.shared.all.indexing.restriction.impl.IndexQueryRestrictionFactory;
 import rocks.inspectit.shared.all.util.ObjectUtils;
 import rocks.inspectit.shared.cs.cmr.service.IHttpTimerDataAccessService;
 import rocks.inspectit.shared.cs.indexing.aggregation.impl.HttpTimerDataAggregator;
 import rocks.inspectit.shared.cs.indexing.query.factory.impl.HttpTimerDataQueryFactory;
-import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
 import rocks.inspectit.shared.cs.indexing.storage.IStorageTreeComponent;
 import rocks.inspectit.shared.cs.indexing.storage.impl.StorageIndexQuery;
 

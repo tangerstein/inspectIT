@@ -1,7 +1,5 @@
 package rocks.inspectit.shared.cs.indexing.query.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.query.provider.IIndexQueryProvider;
 
@@ -17,7 +15,6 @@ public abstract class AbstractQueryFactory<E extends IIndexQuery> {
 	/**
 	 * {@link IIndexQueryProvider}.
 	 */
-	@Autowired
 	private IIndexQueryProvider<E> indexQueryProvider;
 
 	/**

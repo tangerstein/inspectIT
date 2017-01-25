@@ -5,7 +5,7 @@ package rocks.inspectit.server.diagnosis.service;
 
 import java.util.Collection;
 
-import rocks.inspectit.server.diagnosis.service.results.ProblemOccurrence;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
 
 /**
  * @author Alexander Wert

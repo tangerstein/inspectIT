@@ -15,6 +15,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang.mutable.MutableLong;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import rocks.inspectit.server.cache.IBuffer;
@@ -51,6 +52,7 @@ public class CmrManagementService implements ICmrManagementService {
 	 * Buffer data dao.
 	 */
 	@Autowired
+	@Qualifier("atomicBuffer")
 	private IBuffer<DefaultData> buffer;
 
 	/**

@@ -10,9 +10,9 @@ import java.util.List;
 
 import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.JmxSensorValueData;
+import rocks.inspectit.shared.all.indexing.restriction.impl.IndexQueryRestrictionFactory;
 import rocks.inspectit.shared.cs.cmr.service.IJmxDataAccessService;
 import rocks.inspectit.shared.cs.indexing.query.provider.impl.StorageIndexQueryProvider;
-import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
 import rocks.inspectit.shared.cs.indexing.storage.IStorageTreeComponent;
 import rocks.inspectit.shared.cs.indexing.storage.impl.StorageIndexQuery;
 

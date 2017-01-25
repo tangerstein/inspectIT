@@ -6,9 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.aggregation.IAggregator;
@@ -24,21 +21,23 @@ import rocks.inspectit.shared.cs.indexing.buffer.IBufferTreeComponent;
  * @author Ivan Senic
  * 
  */
-public abstract class AbstractBufferDataDao<E extends DefaultData> {
+public class DefaultBufferDataDao<E extends DefaultData> {
 
 	/**
 	 * Indexing tree to search for data.
 	 */
-	@Autowired
 	private IBufferTreeComponent<E> indexingTree;
 	
 	/**
 	 * ForkJoinPool to manage the forks.
 	 */
-	@Autowired
-	@Qualifier("indexingTreeForkJoinPool")
 	private ForkJoinPool forkJoinPool;
 	
+	public DefaultBufferDataDao(IBufferTreeComponent<E> indexingTree, ForkJoinPool forkJoinPool) {
+		this.indexingTree = indexingTree;
+		this.forkJoinPool = forkJoinPool;
+	}
+
 	/**
 	 * Executes the query on the indexing tree.
 	 * 

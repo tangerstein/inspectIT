@@ -21,11 +21,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import rocks.inspectit.server.cache.IBufferElement;
-import rocks.inspectit.server.cache.impl.AtomicBuffer;
-import rocks.inspectit.server.cache.impl.BufferAnalyzer;
-import rocks.inspectit.server.cache.impl.BufferElement;
-import rocks.inspectit.server.cache.impl.BufferIndexer;
-import rocks.inspectit.server.cache.impl.BufferProperties;
 import rocks.inspectit.server.test.AbstractTestNGLogSupport;
 import rocks.inspectit.shared.all.cmr.cache.IObjectSizes;
 import rocks.inspectit.shared.all.communication.DefaultData;
@@ -110,7 +105,8 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 
 		BufferAnalyzer[] analyzerArray = new BufferAnalyzer[analyzers];
 		for (int i = 0; i < analyzers; i++) {
-			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer();
+			bufferAnalyzer.setBuffer(buffer);
 			bufferAnalyzer.start();
 			analyzerArray[i] = bufferAnalyzer;
 		}
@@ -160,7 +156,8 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		// start analyzers
 		BufferAnalyzer[] analyzerArray = new BufferAnalyzer[analyzers];
 		for (int i = 0; i < analyzers; i++) {
-			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer();
+			bufferAnalyzer.setBuffer(buffer);
 			bufferAnalyzer.start();
 			analyzerArray[i] = bufferAnalyzer;
 		}
@@ -234,7 +231,8 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		// start analyzers
 		BufferAnalyzer[] analyzerArray = new BufferAnalyzer[analyzers];
 		for (int i = 0; i < analyzers; i++) {
-			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+			BufferAnalyzer bufferAnalyzer = new BufferAnalyzer();
+			bufferAnalyzer.setBuffer(buffer);
 			bufferAnalyzer.start();
 			analyzerArray[i] = bufferAnalyzer;
 		}
@@ -275,13 +273,15 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		when(defaultData.getObjectSize(objectSizes)).thenReturn(1L);
 
 		// start analyzer
-		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer();
+		bufferAnalyzer.setBuffer(buffer);
 		bufferAnalyzer.start();
 
 		// start indexers
 		BufferIndexer[] indexerArray = new BufferIndexer[indexers];
 		for (int i = 0; i < indexers; i++) {
-			BufferIndexer bufferIndexer = new BufferIndexer(buffer);
+			BufferIndexer bufferIndexer = new BufferIndexer();
+			bufferAnalyzer.setBuffer(buffer);
 			bufferIndexer.start();
 			indexerArray[i] = bufferIndexer;
 		}
@@ -340,10 +340,12 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getObjectSize(objectSizes)).thenReturn(1L);
 
-		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer();
+		bufferAnalyzer.setBuffer(buffer);
 		bufferAnalyzer.start();
 
-		BufferIndexer bufferIndexer = new BufferIndexer(buffer);
+		BufferIndexer bufferIndexer = new BufferIndexer();
+		bufferAnalyzer.setBuffer(buffer);
 		bufferIndexer.start();
 
 		for (int i = 0; i < elements; i++) {
@@ -407,10 +409,12 @@ public class AtomicBufferTest extends AbstractTestNGLogSupport {
 		DefaultData defaultData = mock(DefaultData.class);
 		when(defaultData.getObjectSize(objectSizes)).thenReturn(1L);
 
-		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer(buffer);
+		BufferAnalyzer bufferAnalyzer = new BufferAnalyzer();
+		bufferAnalyzer.setBuffer(buffer);
 		bufferAnalyzer.start();
 
-		BufferIndexer bufferIndexer = new BufferIndexer(buffer);
+		BufferIndexer bufferIndexer = new BufferIndexer();
+		bufferIndexer.setBuffer(buffer);
 		bufferIndexer.start();
 
 		for (int i = 0; i < elements / 2; i++) {

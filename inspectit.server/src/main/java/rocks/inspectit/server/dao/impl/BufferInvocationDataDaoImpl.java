@@ -5,8 +5,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import rocks.inspectit.server.dao.InvocationDataDao;
@@ -14,6 +16,7 @@ import rocks.inspectit.shared.all.communication.comparator.DefaultDataComparator
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.indexing.AbstractBranch;
+import rocks.inspectit.shared.cs.indexing.buffer.IBufferTreeComponent;
 import rocks.inspectit.shared.cs.indexing.query.factory.impl.InvocationSequenceDataQueryFactory;
 
 /**
@@ -25,8 +28,13 @@ import rocks.inspectit.shared.cs.indexing.query.factory.impl.InvocationSequenceD
  * 
  */
 @Repository
-public class BufferInvocationDataDaoImpl extends AbstractBufferDataDao<InvocationSequenceData> implements InvocationDataDao {
-
+public class BufferInvocationDataDaoImpl extends DefaultBufferDataDao<InvocationSequenceData> implements InvocationDataDao {
+	@Autowired
+	public BufferInvocationDataDaoImpl(
+			@Qualifier("indexingTree") IBufferTreeComponent<InvocationSequenceData> indexingTree,
+			@Qualifier("indexingTreeForkJoinPool") ForkJoinPool forkJoinPool) {
+		super(indexingTree, forkJoinPool);
+	}
 	/**
 	 * Index query provider.
 	 */
