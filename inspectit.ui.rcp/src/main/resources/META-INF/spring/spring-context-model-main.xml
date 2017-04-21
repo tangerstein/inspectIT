@@ -38,6 +38,7 @@
 		<lookup-method name="getInfluxDBService" bean="influxDBService" />
 		<lookup-method name="getAlertAccessService" bean="alertAccessService" />
 		<lookup-method name="getAgentInstrumentationService" bean="agentInstrumentationService" />
+		<lookup-method name="getProblemOccurrenceDataAccessService" bean="problemOccurrenceDataAccessService" />
 	</bean>
 
 	<!-- CmrManagementService -->
@@ -277,7 +278,7 @@
 		<property name="defaultValueOnError" value="false" />
 	</bean>
 	<!-- StorageService End -->
-	
+
 	<!-- BusinessContextManagementService -->
 	<bean id="businessContextManagementService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="prototype" lazy-init="true">
 		<property name="proxyInterfaces">
@@ -294,13 +295,13 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="businessContextManagementServiceTarget" class="rocks.inspectit.ui.rcp.repository.service.cmr.CmrService" scope="prototype" lazy-init="true">
 		<property name="serviceInterface" value="rocks.inspectit.shared.cs.cmr.service.IBusinessContextManagementService" />
 		<property name="serviceName" value="BusinessContextManagementService" />
 	</bean>
 	<!-- BusinessContextManagementService End -->
-	
+
 	<!-- ConfigurationInterfaceService -->
 	<bean id="configurationInterfaceService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="prototype" lazy-init="true">
 		<property name="proxyInterfaces">
@@ -324,7 +325,7 @@
 		<property name="defaultValueOnError" value="false" />
 	</bean>
 	<!-- ConfigurationInterfaceService End -->
-	
+
 	<!-- InfluxDBService -->
 	<bean id="influxDBService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="prototype" lazy-init="true">
 		<property name="proxyInterfaces">
@@ -341,13 +342,13 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="influxDBServiceTarget" class="rocks.inspectit.ui.rcp.repository.service.cmr.CmrService" scope="prototype" lazy-init="true">
 		<property name="serviceInterface" value="rocks.inspectit.shared.cs.cmr.service.IInfluxDBService" />
 		<property name="serviceName" value="InfluxDBService" />
 	</bean>
 	<!-- InfluxDBService End -->
-	
+
 	<!-- AlertAccessService -->
 	<bean id="alertAccessService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="prototype" lazy-init="true">
 		<property name="proxyInterfaces">
@@ -364,13 +365,13 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="alertAccessServiceTarget" class="rocks.inspectit.ui.rcp.repository.service.cmr.CmrService" scope="prototype" lazy-init="true">
 		<property name="serviceInterface" value="rocks.inspectit.shared.cs.cmr.service.IAlertService" />
 		<property name="serviceName" value="AlertAccessService" />
 	</bean>
 	<!-- AlertAccessService End -->
-	
+
 	<!-- AgentInstrumentationService -->
 	<bean id="agentInstrumentationService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="prototype" lazy-init="true">
 		<property name="proxyInterfaces">
@@ -387,12 +388,36 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="agentInstrumentationServiceTarget" class="rocks.inspectit.ui.rcp.repository.service.cmr.CmrService" scope="prototype" lazy-init="true">
 		<property name="serviceInterface" value="rocks.inspectit.shared.cs.cmr.service.IAgentInstrumentationService" />
 		<property name="serviceName" value="AgentInstrumentationService" />
 	</bean>
 	<!-- AlertAccessService End -->
+
+	<!-- ProblemOccurrenceDataAccessService -->
+	<bean id="problemOccurrenceDataAccessService" class="org.springframework.aop.framework.ProxyFactoryBean" scope="prototype" lazy-init="true">
+		<property name="proxyInterfaces">
+			<list>
+				<value>rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService</value>
+				<value>rocks.inspectit.ui.rcp.repository.service.cmr.ICmrService</value>
+			</list>
+		</property>
+		<property name="target" ref="problemOccurrenceDataAccessServiceTarget" />
+		<property name="interceptorNames">
+			<list>
+				<value>serviceMethodInterceptor</value>
+				<value>interfaceInterceptor</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="problemOccurrenceDataAccessServiceTarget" class="rocks.inspectit.ui.rcp.repository.service.cmr.CmrService" scope="prototype" lazy-init="true">
+		<property name="serviceInterface" value="rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService" />
+		<property name="serviceName" value="ProblemOccurrenceDataAccessService" />
+	</bean>
+	
+	<!-- ProblemOccurrenceDataAccessService End -->
 
 	<bean id="loggerPostProcessor" class="rocks.inspectit.shared.all.spring.logger.LoggerPostProcessor" />
 

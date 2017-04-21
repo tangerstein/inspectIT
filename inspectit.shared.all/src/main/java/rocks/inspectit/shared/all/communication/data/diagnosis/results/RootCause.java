@@ -37,13 +37,13 @@ public class RootCause implements Serializable {
 	 * Relevant timerData of RootCause.
 	 */
 	@JsonProperty(value = "timerDataProblemOccurence")
-	private TimerDataProblemOccurence timerDataProblemOccurence;
+	private TimerDataProblemOccurrence timerDataProblemOccurence;
 
 	/**
 	 * Map of underlying methodsNames mapped to the {@link #timerData} of the rootCause.
 	 */
 	@JsonProperty(value = "TimerDataPerMethod")
-	private Map<Long, ArrayList<TimerDataProblemOccurence>> timerDataPerMethod = new HashMap<Long, ArrayList<TimerDataProblemOccurence>>();
+	private Map<Long, ArrayList<TimerDataProblemOccurrence>> timerDataPerMethod = new HashMap<Long, ArrayList<TimerDataProblemOccurrence>>();
 
 	/**
 	 * This constructor creates new RootCause.
@@ -53,17 +53,17 @@ public class RootCause implements Serializable {
 	 */
 	public RootCause(AggregatedInvocationSequenceData rootCauseInvocations) {
 		this.methodIdent = rootCauseInvocations.getMethodIdent();
-		this.timerDataProblemOccurence = new TimerDataProblemOccurence(rootCauseInvocations);
+		this.timerDataProblemOccurence = new TimerDataProblemOccurrence(rootCauseInvocations);
 
-		ArrayList<TimerDataProblemOccurence> timerList;
+		ArrayList<TimerDataProblemOccurrence> timerList;
 		for (InvocationSequenceData invocation : rootCauseInvocations.getRawInvocationsSequenceElements()) {
 			long methodIdent = invocation.getMethodIdent();
 			if (this.timerDataPerMethod.containsKey(methodIdent)) {
 				timerList = this.timerDataPerMethod.get(methodIdent);
-				timerList.add(new TimerDataProblemOccurence(invocation));
+				timerList.add(new TimerDataProblemOccurrence(invocation));
 			} else {
-				timerList = new ArrayList<TimerDataProblemOccurence>();
-				timerList.add(new TimerDataProblemOccurence(invocation));
+				timerList = new ArrayList<TimerDataProblemOccurrence>();
+				timerList.add(new TimerDataProblemOccurrence(invocation));
 				this.timerDataPerMethod.put(methodIdent, timerList);
 			}
 		}
@@ -93,7 +93,7 @@ public class RootCause implements Serializable {
 	 *
 	 * @return {@link #timerDataProblemOccurence}
 	 */
-	public final TimerDataProblemOccurence getTimerDataProblemOccurence() {
+	public final TimerDataProblemOccurrence getTimerDataProblemOccurence() {
 		return this.timerDataProblemOccurence;
 	}
 
@@ -103,7 +103,7 @@ public class RootCause implements Serializable {
 	 * @param timerDataProblemOccurence
 	 *            New value for {@link #timerDataProblemOccurence}
 	 */
-	public final void setTimerDataProblemOccurence(TimerDataProblemOccurence timerDataProblemOccurence) {
+	public final void setTimerDataProblemOccurence(TimerDataProblemOccurrence timerDataProblemOccurence) {
 		this.timerDataProblemOccurence = timerDataProblemOccurence;
 	}
 
@@ -112,7 +112,7 @@ public class RootCause implements Serializable {
 	 *
 	 * @return {@link #timerDataPerMethod}
 	 */
-	public final Map<Long, ArrayList<TimerDataProblemOccurence>> getTimerDataPerMethod() {
+	public final Map<Long, ArrayList<TimerDataProblemOccurrence>> getTimerDataPerMethod() {
 		return this.timerDataPerMethod;
 	}
 
@@ -122,7 +122,7 @@ public class RootCause implements Serializable {
 	 * @param timerDataPerMethod
 	 *            New value for {@link #timerDataPerMethod}
 	 */
-	public final void setTimerDataPerMethod(Map<Long, ArrayList<TimerDataProblemOccurence>> timerDataPerMethod) {
+	public final void setTimerDataPerMethod(Map<Long, ArrayList<TimerDataProblemOccurrence>> timerDataPerMethod) {
 		this.timerDataPerMethod = timerDataPerMethod;
 	}
 

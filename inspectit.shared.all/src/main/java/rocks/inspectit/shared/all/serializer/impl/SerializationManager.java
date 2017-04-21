@@ -92,6 +92,11 @@ import rocks.inspectit.shared.all.communication.data.cmr.AgentStatusData.AgentCo
 import rocks.inspectit.shared.all.communication.data.cmr.ApplicationData;
 import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData;
 import rocks.inspectit.shared.all.communication.data.cmr.CmrStatusData;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.InvocationIdentifier;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.RootCause;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.TimerDataProblemOccurrence;
 import rocks.inspectit.shared.all.exception.BusinessException;
 import rocks.inspectit.shared.all.exception.RemoteException;
 import rocks.inspectit.shared.all.exception.TechnicalException;
@@ -181,7 +186,8 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 	 * Initialize {@link Kryo} properties.
 	 */
 	public void initKryo() {
-		// if hibernateUtil is provided, we create special kind of class resolver
+		// if hibernateUtil is provided, we create special kind of class
+		// resolver
 		ClassResolver classResolver;
 		if (null != hibernateUtil) {
 			classResolver = new HibernateAwareClassResolver(hibernateUtil);
@@ -189,7 +195,8 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 			classResolver = new DefaultClassResolver();
 		}
 
-		// we disable references for DefaultData objects because they are not needed
+		// we disable references for DefaultData objects because they are not
+		// needed
 		// invocations will be handled manually
 		ReferenceResolver referenceResolver = new MapReferenceResolver() {
 			@SuppressWarnings("rawtypes")
@@ -269,6 +276,12 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 		kryo.register(CompilationInformationData.class, new CustomCompatibleFieldSerializer<CompilationInformationData>(kryo, CompilationInformationData.class, schemaManager));
 		kryo.register(ClassLoadingInformationData.class, new CustomCompatibleFieldSerializer<ClassLoadingInformationData>(kryo, ClassLoadingInformationData.class, schemaManager));
 		kryo.register(ParameterContentType.class, new EnumSerializer(ParameterContentType.class));
+		/** diagnoseIT results **/
+		kryo.register(ProblemOccurrence.class, new CustomCompatibleFieldSerializer<ProblemOccurrence>(kryo, ProblemOccurrence.class, schemaManager));
+		kryo.register(CauseStructure.class, new CustomCompatibleFieldSerializer<CauseStructure>(kryo, CauseStructure.class, schemaManager));
+		kryo.register(TimerDataProblemOccurrence.class, new CustomCompatibleFieldSerializer<TimerDataProblemOccurrence>(kryo, TimerDataProblemOccurrence.class, schemaManager));
+		kryo.register(InvocationIdentifier.class, new CustomCompatibleFieldSerializer<InvocationIdentifier>(kryo, InvocationIdentifier.class, schemaManager));
+		kryo.register(RootCause.class, new FieldSerializer<RootCause>(kryo, RootCause.class));
 
 		// aggregation classes
 		kryo.register(AggregatedExceptionSensorData.class, new InvocationAwareDataSerializer<AggregatedExceptionSensorData>(kryo, AggregatedExceptionSensorData.class, schemaManager));
@@ -284,12 +297,14 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 		});
 
 		// data classes between CMR and UI
-		// this classes can be registered with FieldSerializer since they are not saved to disk
+		// this classes can be registered with FieldSerializer since they are
+		// not saved to disk
 		kryo.register(CmrStatusData.class, new FieldSerializer<CmrStatusData>(kryo, CmrStatusData.class));
 		kryo.register(AgentStatusData.class, new FieldSerializer<AgentStatusData>(kryo, AgentStatusData.class));
 		kryo.register(AgentConnection.class, new EnumSerializer(AgentConnection.class));
 
-		// INSPECTIT-849 - Hibernate uses Arrays.asList which does not have no-arg constructor
+		// INSPECTIT-849 - Hibernate uses Arrays.asList which does not have
+		// no-arg constructor
 		kryo.register(Arrays.asList().getClass(), new CollectionSerializer() {
 			@Override
 			@SuppressWarnings("rawtypes")

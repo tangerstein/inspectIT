@@ -11,6 +11,7 @@ import rocks.inspectit.shared.cs.cmr.service.IHttpTimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IInfluxDBService;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IJmxDataAccessService;
+import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IServerStatusService;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IStorageService;
@@ -326,4 +327,22 @@ public abstract class CmrServiceProvider {
 	 * @return Returns Spring created {@link IAgentInstrumentationService}.
 	 */
 	protected abstract IAgentInstrumentationService getAgentInstrumentationService();
+	
+	/**
+	 * Returns Spring created {@link IProblemOccurrenceDataAccessService}.
+	 *
+	 * @return Returns Spring created {@link IProblemOccurrenceDataAccessService}.
+	 */
+	protected abstract IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService();
+
+	/**
+	 * /** Returns properly initialized {@link IProblemOccurrenceDataAccessService}.
+	 *
+	 * @return Returns properly initialized {@link IProblemOccurrenceDataAccessService}.
+	 */
+	public IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService(CmrRepositoryDefinition cmrRepositoryDefinition) {
+		IProblemOccurrenceDataAccessService problemOccurrenceDataAccessService = getProblemOccurrenceDataAccessService();
+		((ICmrService) problemOccurrenceDataAccessService).initService(cmrRepositoryDefinition);
+		return problemOccurrenceDataAccessService;
+	}
 }

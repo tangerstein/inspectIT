@@ -14,7 +14,7 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceDataHelpe
  * @author Christian Voegele
  *
  */
-public class TimerDataProblemOccurence implements Serializable {
+public class TimerDataProblemOccurrence implements Serializable {
 
 	/**
 	 * Default serialVersionUID.
@@ -45,7 +45,7 @@ public class TimerDataProblemOccurence implements Serializable {
 	 * @param invocationSequenceData
 	 *            The invocationSequenceData the timer data is taken into account
 	 */
-	public TimerDataProblemOccurence(final InvocationSequenceData invocationSequenceData) {
+	public TimerDataProblemOccurrence(final InvocationSequenceData invocationSequenceData) {
 		if (null == invocationSequenceData.getTimerData()) {
 			throw new IllegalArgumentException("TimerData cannot be null!");
 		}
@@ -142,7 +142,7 @@ public class TimerDataProblemOccurence implements Serializable {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		TimerDataProblemOccurence other = (TimerDataProblemOccurence) obj;
+		TimerDataProblemOccurrence other = (TimerDataProblemOccurrence) obj;
 		if (Double.doubleToLongBits(this.cpuDuration) != Double.doubleToLongBits(other.cpuDuration)) {
 			return false;
 		}

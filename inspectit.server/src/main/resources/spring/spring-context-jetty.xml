@@ -89,6 +89,21 @@
 	</bean>
 	<!-- END -->
 
+	<!-- ProblemOccurrence Data Access Service -->
+	<bean name="problemOccurrenceDataAccessServiceHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
+	</bean>
+
+	<bean id="problemOccurrenceDataAccessServiceHolder" class="org.mortbay.jetty.servlet.ServletHolder">
+		<property name="name" value="problemOccurrenceDataAccessServiceExporter" />
+		<property name="servlet" ref="problemOccurrenceDataAccessServiceHandlerServlet" />
+	</bean>
+
+	<bean id="problemOccurrenceDataAccessServiceMapping" class="org.mortbay.jetty.servlet.ServletMapping">
+		<property name="servletName" value="problemOccurrenceDataAccessServiceExporter" />
+		<property name="pathSpec" value="/remoting/ProblemOccurrenceDataAccessService" />
+	</bean>
+	<!-- END -->
+
 	<!-- CmrManagementService -->
 	<bean name="cmrManagementServiceRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
@@ -118,7 +133,7 @@
 		<property name="pathSpec" value="/remoting/ExceptionDataAccessService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Jmx Data Access Service -->
 	<bean name="jmxDataAccessRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
@@ -194,7 +209,7 @@
 		<property name="pathSpec" value="/remoting/StorageService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- ConfigurationInterface Service -->
 	<bean name="configurationInterfaceServiceRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet" />
 
@@ -223,7 +238,7 @@
 		<property name="pathSpec" value="/remoting/BusinessContextManagementService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Influx Database Service -->
 	<bean name="influxDBRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
@@ -238,7 +253,7 @@
 		<property name="pathSpec" value="/remoting/InfluxDBService" />
 	</bean>
 	<!-- END -->
-	
+
 	<!-- Alert Access Service -->
 	<bean name="alertAccessRequestHandlerServlet" class="org.springframework.web.context.support.HttpRequestHandlerServlet">
 	</bean>
@@ -387,6 +402,8 @@
 				<ref bean="defaultServletHolder" />
 				<ref bean="uploadServletHolder" />
 				<ref bean="springDispatcherServletHolder" />
+				<ref bean="problemOccurrenceDataAccessServiceHolder" />
+
 			</list>
 		</property>
 		<property name="servletMappings">
@@ -409,6 +426,8 @@
 				<ref bean="defaultServletMapping" />
 				<ref bean="uploadServletMapping" />
 				<ref bean="springDispatcherServletMapping" />
+				<ref bean="problemOccurrenceDataAccessServiceMapping" />
+
 			</list>
 		</property>
 		<property name="filters">

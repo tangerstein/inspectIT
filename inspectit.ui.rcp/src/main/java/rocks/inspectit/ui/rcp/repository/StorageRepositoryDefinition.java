@@ -14,12 +14,14 @@ import rocks.inspectit.shared.all.communication.data.JmxSensorValueData;
 import rocks.inspectit.shared.all.communication.data.SqlStatementData;
 import rocks.inspectit.shared.all.communication.data.TimerData;
 import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData;
+import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
 import rocks.inspectit.shared.cs.cmr.service.IBusinessContextManagementService;
 import rocks.inspectit.shared.cs.cmr.service.IExceptionDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IGlobalDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IHttpTimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IJmxDataAccessService;
+import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ITimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.cache.CachedDataService;
@@ -28,8 +30,8 @@ import rocks.inspectit.shared.cs.storage.LocalStorageData;
 import rocks.inspectit.ui.rcp.repository.service.storage.StorageServiceProvider;
 
 /**
- * Storage repository definition. This {@link RepositoryDefinition} has a direct usage of a
- * {@link CmrRepositoryDefinition} where storage is located.
+ * Storage repository definition. This {@link RepositoryDefinition} has a direct
+ * usage of a {@link CmrRepositoryDefinition} where storage is located.
  *
  * @author Ivan Senic
  *
@@ -97,6 +99,11 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	private StorageServiceProvider storageServiceProvider;
 
 	/**
+	 * {@link StorageServiceProvider} for instantiating storage services.
+	 */
+	private IProblemOccurrenceDataAccessService problemOccurrenceDataAccessService;
+
+	/**
 	 * Indexing tree for storage.
 	 */
 	private IStorageTreeComponent<? extends DefaultData> indexingTree;
@@ -107,7 +114,8 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	private List<PlatformIdent> agents;
 
 	/**
-	 * Collection of {@link BusinessTransactionData} instances to use for this storage.
+	 * Collection of {@link BusinessTransactionData} instances to use for this
+	 * storage.
 	 */
 	private Collection<BusinessTransactionData> businessTransactions;
 
@@ -210,18 +218,38 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
+	public IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService() {
+		return problemOccurrenceDataAccessService;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@SuppressWarnings("unchecked")
 	public void initServices() {
 		// init services
-		globalDataAccessService = storageServiceProvider.createStorageGlobalDataAccessService(this, localStorageData, (IStorageTreeComponent<DefaultData>) indexingTree, agents);
-		exceptionDataAccessService = storageServiceProvider.createStorageExceptionDataAccessService(this, localStorageData, (IStorageTreeComponent<ExceptionSensorData>) indexingTree);
-		invocationDataAccessService = storageServiceProvider.createStorageInvocationDataAccessService(this, localStorageData, (IStorageTreeComponent<InvocationSequenceData>) indexingTree);
-		sqlDataAccessService = storageServiceProvider.createStorageSqlDataAccessService(this, localStorageData, (IStorageTreeComponent<SqlStatementData>) indexingTree);
-		timerDataAccessService = storageServiceProvider.createStorageTimerDataAccessService(this, localStorageData, (IStorageTreeComponent<TimerData>) indexingTree);
-		httpTimerDataAccessService = storageServiceProvider.createStorageHttpTimerDataAccessService(this, localStorageData, (IStorageTreeComponent<HttpTimerData>) indexingTree);
-		jmxDataAccessService = storageServiceProvider.createStorageJmxDataAccessService(this, localStorageData, (IStorageTreeComponent<JmxSensorValueData>) indexingTree);
-		businessContextService = storageServiceProvider.createStorageBusinessContextService(this, localStorageData, (IStorageTreeComponent<DefaultData>) indexingTree, businessTransactions);
-		// for storage we use the regular cached data service because ids can never change
+		globalDataAccessService = storageServiceProvider.createStorageGlobalDataAccessService(this, localStorageData,
+				(IStorageTreeComponent<DefaultData>) indexingTree, agents);
+		exceptionDataAccessService = storageServiceProvider.createStorageExceptionDataAccessService(this,
+				localStorageData, (IStorageTreeComponent<ExceptionSensorData>) indexingTree);
+		invocationDataAccessService = storageServiceProvider.createStorageInvocationDataAccessService(this,
+				localStorageData, (IStorageTreeComponent<InvocationSequenceData>) indexingTree);
+		sqlDataAccessService = storageServiceProvider.createStorageSqlDataAccessService(this, localStorageData,
+				(IStorageTreeComponent<SqlStatementData>) indexingTree);
+		timerDataAccessService = storageServiceProvider.createStorageTimerDataAccessService(this, localStorageData,
+				(IStorageTreeComponent<TimerData>) indexingTree);
+		httpTimerDataAccessService = storageServiceProvider.createStorageHttpTimerDataAccessService(this,
+				localStorageData, (IStorageTreeComponent<HttpTimerData>) indexingTree);
+		jmxDataAccessService = storageServiceProvider.createStorageJmxDataAccessService(this, localStorageData,
+				(IStorageTreeComponent<JmxSensorValueData>) indexingTree);
+		businessContextService = storageServiceProvider.createStorageBusinessContextService(this, localStorageData,
+				(IStorageTreeComponent<DefaultData>) indexingTree, businessTransactions);
+		problemOccurrenceDataAccessService = storageServiceProvider.createStorageProblemOccurrenceDataAccessService(
+				this, localStorageData, (IStorageTreeComponent<ProblemOccurrence>) indexingTree);
+
+		// for storage we use the regular cached data service because ids can
+		// never change
 		cachedDataService = new CachedDataService(globalDataAccessService, businessContextService);
 	}
 

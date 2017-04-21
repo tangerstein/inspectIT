@@ -154,7 +154,23 @@ public final class IndexQueryRestrictionFactory {
 	}
 
 	/**
-	 * Returns are all in collection restriction. This restriction checks if the value supplied via
+	 * Returns collection contains object restriction. This restriction checks if the value supplied
+	 * via {@link IIndexQueryRestriction#isFulfilled(Object)} is a collection, and checks weather
+	 * the collection contains the provided object.
+	 *
+	 * @param fieldName
+	 *            Name of the field that is restriction bounded to.
+	 * @param object
+	 *            The object, which should be in the collection
+	 * @return index query restriction
+	 * @see Collection#containsAll(Object);
+	 */
+	public static IIndexQueryRestriction collectionContainsObject(String fieldName, Object object) {
+		return new CollectionContainsObject(fieldName, object);
+	}
+
+	/**
+	 * Returns Collection . This restriction checks if the value supplied via
 	 * {@link IIndexQueryRestriction#isFulfilled(Object)} is a collection, and all it members are
 	 * also contained in the collection provided with object construction. Note that this
 	 * restriction has to be bounded to a {@link Collection} field.
@@ -568,6 +584,82 @@ public final class IndexQueryRestrictionFactory {
 					return false;
 				}
 			} else if (!collection.equals(other.collection)) {
+				return false;
+			}
+			return true;
+		}
+
+	}
+
+	/**
+	 * This restriction checks if the collection supplied via
+	 * {@link IIndexQueryRestriction#isFulfilled(Object)} contains a given value.
+	 *
+	 * @author Tobias Angerstein
+	 *
+	 */
+	private static class CollectionContainsObject extends AbstractIndexQueryRestriction {
+
+		/**
+		 * Object which will be searched in the collection.
+		 */
+		private Object element;
+
+		/**
+		 * Default constructor.
+		 *
+		 * @param fieldName
+		 *            Name of the field that is restriction bounded to.
+		 * @param element
+		 *            Collection to look in.
+		 */
+		public CollectionContainsObject(String fieldName, Object element) {
+			super(fieldName);
+			this.element = element;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean isFulfilled(Object fieldValue) {
+			if (!(fieldValue instanceof Collection<?>)) {
+				return false;
+			}
+			return ((Collection<?>) fieldValue).contains(element);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = super.hashCode();
+			result = (prime * result) + ((element == null) ? 0 : element.hashCode());
+			return result;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (!super.equals(obj)) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			CollectionContainsObject other = (CollectionContainsObject) obj;
+			if (element == null) {
+				if (other.element != null) {
+					return false;
+				}
+			} else if (!element.equals(other.element)) {
 				return false;
 			}
 			return true;
