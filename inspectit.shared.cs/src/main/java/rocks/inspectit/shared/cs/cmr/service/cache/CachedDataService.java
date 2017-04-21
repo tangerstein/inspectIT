@@ -73,6 +73,12 @@ public class CachedDataService implements InitializingBean, ICachedDataService {
 	private Map<Long, MethodIdent> methodMap = new ConcurrentHashMap<>();
 
 	/**
+	 * This map is needed to store the mapping between the ID's and the method names. The
+	 * information is needed to map the names to the ID's again
+	 */
+	private final Map<String, Long> reverseMethodMap = new ConcurrentHashMap<String, Long>();
+
+	/**
 	 * This map is needed to store the mapping between the ID's and the
 	 * {@link JmxDefinitionDataIdent} objects. Some views / editors need this information because
 	 * they can only access the ID.
@@ -86,11 +92,23 @@ public class CachedDataService implements InitializingBean, ICachedDataService {
 	private final Map<Integer, ApplicationData> applicationMap = new ConcurrentHashMap<Integer, ApplicationData>();
 
 	/**
+	 * This map is needed to store the mapping between the ID's and the application names. The
+	 * information is needed to map the names to the ID's again
+	 */
+	private final Map<String, Integer> reverseApplicationMap = new ConcurrentHashMap<String, Integer>();
+
+	/**
 	 * This map is needed to store the mapping between the ID's and the
 	 * {@link BusinessTransactionData} objects. Some views / editors need this information because
 	 * they can only access the ID.
 	 */
 	private final Map<Pair<Integer, Integer>, BusinessTransactionData> businessTransactionsMap = new ConcurrentHashMap<Pair<Integer, Integer>, BusinessTransactionData>();
+
+	/**
+	 * This map is needed to store the mapping between the ID's and the Business transaction names.
+	 * The information is needed to map the names to the ID's again
+	 */
+	private final Map<String, Pair<Integer, Integer>> reverseBusinessTransactionsMap = new ConcurrentHashMap<String, Pair<Integer, Integer>>();
 
 	/**
 	 * No-args constructor.
@@ -139,7 +157,9 @@ public class CachedDataService implements InitializingBean, ICachedDataService {
 
 		for (MethodIdent methodIdent : platformIdent.getMethodIdents()) {
 			methodMap.remove(methodIdent.getId());
+			reverseMethodMap.remove(methodIdent.toString());
 			methodMap.put(methodIdent.getId(), methodIdent);
+			reverseMethodMap.put(methodIdent.toString(), methodIdent.getId());
 		}
 
 		for (SensorTypeIdent sensorTypeIdent : platformIdent.getSensorTypeIdents()) {
@@ -241,6 +261,7 @@ public class CachedDataService implements InitializingBean, ICachedDataService {
 		Map<PlatformIdent, AgentStatusData> agentMap = globalDataAccessService.getAgentsOverview();
 		platformMap.clear();
 		methodMap.clear();
+		reverseMethodMap.clear();
 		sensorTypeMap.clear();
 		jmxDefinitionDataMap.clear();
 
@@ -256,6 +277,7 @@ public class CachedDataService implements InitializingBean, ICachedDataService {
 
 			for (MethodIdent methodIdent : platformIdent.getMethodIdents()) {
 				methodMap.put(methodIdent.getId(), methodIdent);
+				reverseMethodMap.put(methodIdent.toString(), methodIdent.getId());
 			}
 
 			for (SensorTypeIdent sensorTypeIdent : platformIdent.getSensorTypeIdents()) {
@@ -273,12 +295,16 @@ public class CachedDataService implements InitializingBean, ICachedDataService {
 	 */
 	private void refreshBusinessContext() {
 		applicationMap.clear();
+		reverseApplicationMap.clear();
 		businessTransactionsMap.clear();
+		reverseBusinessTransactionsMap.clear();
 		for (BusinessTransactionData businessTx : businessContextService.getBusinessTransactions()) {
 			businessTransactionsMap.put(new Pair<Integer, Integer>(businessTx.getApplication().getId(), businessTx.getId()), businessTx);
+			reverseBusinessTransactionsMap.put(businessTx.getName(), new Pair<Integer, Integer>(businessTx.getApplication().getId(), businessTx.getId()));
 		}
 		for (ApplicationData application : businessContextService.getApplications()) {
 			applicationMap.put(application.getId(), application);
+			reverseApplicationMap.put(application.getName(), application.getId());
 		}
 	}
 
@@ -289,5 +315,79 @@ public class CachedDataService implements InitializingBean, ICachedDataService {
 	public void afterPropertiesSet() throws Exception {
 		refreshIdents();
 		refreshBusinessContext();
+	}
+
+	/**
+	 * Returns corresponding id the a method name.
+	 * 
+	 * @param methodName
+	 *            method name
+	 * @return methodId
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the id can't be found
+	 * 
+	 */
+	public long getIdForMethodName(String methodName) throws IllegalArgumentException {
+		if (methodName == null) {
+			return 0;
+		}
+		if (!reverseMethodMap.containsKey(methodName)) {
+			refreshIdents();
+			if (!reverseMethodMap.containsKey(methodName)) {
+				throw new IllegalArgumentException("Method name " + methodName + " does not exist!");
+			}
+		}
+
+		return reverseMethodMap.get(methodName);
+	}
+
+	/**
+	 * Returns corresponding id for an application.
+	 * 
+	 * @param applicationName
+	 *            applicationName
+	 * @return application id
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the id can't be found TODO: can be done faster
+	 */
+	public int getIdForApplicationName(String applicationName) throws IllegalArgumentException {
+		if (applicationName == null) {
+			return 0;
+		}
+		if (!reverseApplicationMap.containsKey(applicationName)) {
+			refreshBusinessContext();
+			if (!reverseApplicationMap.containsKey(applicationName)) {
+				throw new IllegalArgumentException("Application name " + applicationName + " does not exist!");
+			}
+		}
+
+		return reverseApplicationMap.get(applicationName);
+	}
+
+	/**
+	 * Returns corresponding id the a business transaction name.
+	 * 
+	 * @param businessTransactionName
+	 *            businessTransactionName
+	 * @return businessTransactionId
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the id can't be found
+	 * 
+	 */
+	public int getIdForBusinessTransactionName(String businessTransactionName) throws IllegalArgumentException {
+		if (businessTransactionName == null) {
+			return 0;
+		}
+		if (!reverseBusinessTransactionsMap.containsKey(businessTransactionName)) {
+			refreshBusinessContext();
+			if (!reverseBusinessTransactionsMap.containsKey(businessTransactionName)) {
+				throw new IllegalArgumentException("Business transaction name " + businessTransactionName + " does not exist!");
+			}
+		}
+
+		return reverseBusinessTransactionsMap.get(businessTransactionName).getSecond();
 	}
 }

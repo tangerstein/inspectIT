@@ -8,8 +8,8 @@ import rocks.inspectit.shared.all.communication.data.cmr.ApplicationData;
 import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData;
 
 /**
- * Interface for the cached data service. Provides platform, sensor, method ident and business
- * context from the cache.
+ * Interface for the cached data service. Provides platform, sensor, method
+ * ident and business context from the cache.
  *
  * @author Ivan Senic
  *
@@ -17,7 +17,8 @@ import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData
 public interface ICachedDataService {
 
 	/**
-	 * Returns the mapped {@link PlatformIdent} object for the passed platform id.
+	 * Returns the mapped {@link PlatformIdent} object for the passed platform
+	 * id.
 	 *
 	 * @param platformId
 	 *            The long value.
@@ -26,7 +27,8 @@ public interface ICachedDataService {
 	PlatformIdent getPlatformIdentForId(long platformId);
 
 	/**
-	 * Returns the mapped {@link SensorTypeIdent} object for the passed sensor type id.
+	 * Returns the mapped {@link SensorTypeIdent} object for the passed sensor
+	 * type id.
 	 *
 	 * @param sensorTypeId
 	 *            The long value.
@@ -44,7 +46,8 @@ public interface ICachedDataService {
 	MethodIdent getMethodIdentForId(long methodId);
 
 	/**
-	 * Returns the mapped {@link JmxDefinitionDataIdent} object for the passed jmDefinitionData id.
+	 * Returns the mapped {@link JmxDefinitionDataIdent} object for the passed
+	 * jmDefinitionData id.
 	 *
 	 * @param jmxDefinitionDataId
 	 *            The long value.
@@ -57,21 +60,61 @@ public interface ICachedDataService {
 	 *
 	 * @param id
 	 *            unique identifier of the application definition
-	 * @return Returns the application definition for the given id or null if no applicaiton
-	 *         definition for the id exists.
+	 * @return Returns the application definition for the given id or null if no
+	 *         applicaiton definition for the id exists.
 	 */
 	ApplicationData getApplicationForId(int id);
 
 	/**
-	 * Retrieves the {@link BusinessTransactionDefinition} for the given application and business
-	 * transaction identifiers.
+	 * Retrieves the {@link BusinessTransactionDefinition} for the given
+	 * application and business transaction identifiers.
 	 *
 	 * @param appId
 	 *            unique identifier of the application definition
 	 * @param businessTxId
 	 *            unique identifier of the business transaction definition
-	 * @return Returns the business transaction definition or null if no business transaction
-	 *         definition for the given pair of identifiers exists.
+	 * @return Returns the business transaction definition or null if no
+	 *         business transaction definition for the given pair of identifiers
+	 *         exists.
 	 */
 	BusinessTransactionData getBusinessTransactionForId(int appId, int businessTxId);
+
+	/**
+	 * Returns corresponding id the a method name.
+	 * 
+	 * @param methodName
+	 *            method name
+	 * @return methodId
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the id can't be found
+	 * 
+	 */
+	long getIdForMethodName(String methodName) throws IllegalArgumentException;
+
+	/**
+	 * Returns corresponding id for an application.
+	 * 
+	 * @param applicationName
+	 *            applicationName
+	 * @return application id
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the id can't be found TODO: can be done faster
+	 */
+	int getIdForApplicationName(String applicationName) throws IllegalArgumentException;
+
+	/**
+	 * Returns corresponding id the a business transaction name.
+	 * 
+	 * @param businessTransactionName
+	 *            businessTransactionName
+	 * @return businessTransactionId
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the id can't be found
+	 * 
+	 */
+	int getIdForBusinessTransactionName(String businessTransactionName) throws IllegalArgumentException;
+
 }

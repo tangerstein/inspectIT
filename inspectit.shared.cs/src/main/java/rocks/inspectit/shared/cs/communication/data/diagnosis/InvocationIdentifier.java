@@ -44,7 +44,7 @@ public class InvocationIdentifier {
 
 		this.methodIdent = invocationSequenceData.getMethodIdent();
 		this.invocationId = invocationSequenceData.getId();
-		this.timerDataProblemOccurence = new TimerDataProblemOccurence(invocationSequenceData);
+		this.timerDataProblemOccurence = new TimerDataProblemOccurrence(invocationSequenceData);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class InvocationIdentifier {
 	 *
 	 * @return {@link #timerDataProblemOccurence}
 	 */
-	public final TimerDataProblemOccurence getTimerDataProblemOccurence() {
+	public final TimerDataProblemOccurrence getTimerDataProblemOccurence() {
 		return this.timerDataProblemOccurence;
 	}
 

@@ -320,7 +320,8 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			}
 		};
 		for (Column column : Column.values()) {
-			// since it is remote sorting we do not provide local cached data service
+			// since it is remote sorting we do not provide local cached data
+			// service
 			ResultComparator<InvocationSequenceData> resultComparator = new ResultComparator<>(column.dataComparator);
 			invocOverviewViewerComparator.addColumn(getMappedTableViewerColumn(column).getColumn(), resultComparator);
 		}
@@ -420,7 +421,8 @@ public class InvocOverviewInputController extends AbstractTableInputController {
 			}
 		}
 
-		// why this? so only update with new data if returned collection is not empty, i would say
+		// why this? so only update with new data if returned collection is not
+		// empty, i would say
 		// with every update, if it is empty, then there is nothing to display
 		// then i also done need the clearInvocationFlag
 		// I changed here, .clear() is now out of if clause

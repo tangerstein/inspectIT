@@ -55,6 +55,12 @@ public class ProblemOccurrence {
 	private CauseStructure causeStructure;
 
 	/**
+	 * Default no-args constructor.
+	 */
+	public ProblemOccurrence() {
+	}
+
+	/**
 	 * Constructor that creates new ProblemOccurence based on InvocationSequenceData.
 	 *
 	 * @param requestRoot
@@ -75,6 +81,35 @@ public class ProblemOccurrence {
 		this.requestRoot = new InvocationIdentifier(requestRoot);
 		this.globalContext = new InvocationIdentifier(globalContext);
 		this.problemContext = new InvocationIdentifier(problemContext);
+		this.rootCause = rootCause;
+		this.causeStructure = causeStructure;
+	}
+
+	/**
+	 * Constructor that creates new ProblemOccurence based on InvocationIdentifier.
+	 * 
+	 * @param requestRoot
+	 *            request root
+	 * @param globalContext
+	 *            global context
+	 * @param problemContext
+	 *            problem context
+	 * @param rootCause
+	 *            root cause
+	 * @param causeStructure
+	 *            cause structure
+	 * @param businessTransactionNameIdent
+	 *            business transaction id
+	 * @param applicationNameIdent
+	 *            application id
+	 */
+	public ProblemOccurrence(InvocationIdentifier requestRoot, InvocationIdentifier globalContext, InvocationIdentifier problemContext, RootCause rootCause, CauseStructure causeStructure,
+			int businessTransactionNameIdent, int applicationNameIdent) {
+		this.businessTransactionNameIdent = businessTransactionNameIdent;
+		this.applicationNameIdent = applicationNameIdent;
+		this.requestRoot = requestRoot;
+		this.globalContext = globalContext;
+		this.problemContext = problemContext;
 		this.rootCause = rootCause;
 		this.causeStructure = causeStructure;
 	}

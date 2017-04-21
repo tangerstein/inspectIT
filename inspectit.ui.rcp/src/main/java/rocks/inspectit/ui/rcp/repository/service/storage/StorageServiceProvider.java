@@ -14,14 +14,14 @@ import rocks.inspectit.shared.all.communication.data.TimerData;
 import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData;
 import rocks.inspectit.shared.all.tracing.data.AbstractSpan;
 import rocks.inspectit.shared.cs.cmr.service.IBusinessContextManagementService;
-import rocks.inspectit.shared.cs.cmr.service.ISpanService;
+import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
 import rocks.inspectit.shared.cs.indexing.storage.IStorageTreeComponent;
 import rocks.inspectit.shared.cs.storage.LocalStorageData;
 import rocks.inspectit.ui.rcp.repository.StorageRepositoryDefinition;
 
 /**
- * Provider of all storage related services. This classes correctly initialize the service with help
- * of Spring.
+ * Provider of all storage related services. This classes correctly initialize
+ * the service with help of Spring.
  *
  * @author Ivan Senic
  *
@@ -44,7 +44,8 @@ public abstract class StorageServiceProvider {
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageTimerDataAccessService}.
 	 */
-	public StorageTimerDataAccessService createStorageTimerDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public StorageTimerDataAccessService createStorageTimerDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<TimerData> storageTreeComponent) {
 		StorageTimerDataAccessService storageTimerDataService = createStorageTimerDataAccessService();
 		storageTimerDataService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -69,7 +70,8 @@ public abstract class StorageServiceProvider {
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageHttpTimerDataAccessService}.
 	 */
-	public StorageHttpTimerDataAccessService createStorageHttpTimerDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public StorageHttpTimerDataAccessService createStorageHttpTimerDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<HttpTimerData> storageTreeComponent) {
 		StorageHttpTimerDataAccessService storageHttpTimerDataService = createStorageHttpTimerDataAccessService();
 		storageHttpTimerDataService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -94,7 +96,8 @@ public abstract class StorageServiceProvider {
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageSqlDataAccessService}.
 	 */
-	public StorageSqlDataAccessService createStorageSqlDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public StorageSqlDataAccessService createStorageSqlDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<SqlStatementData> storageTreeComponent) {
 		StorageSqlDataAccessService storageSqlDataAccessService = createStorageSqlDataAccessService();
 		storageSqlDataAccessService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -119,7 +122,8 @@ public abstract class StorageServiceProvider {
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageExceptionDataAccessService}.
 	 */
-	public StorageExceptionDataAccessService createStorageExceptionDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public StorageExceptionDataAccessService createStorageExceptionDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<ExceptionSensorData> storageTreeComponent) {
 		StorageExceptionDataAccessService storageExceptionDataAccessService = createStorageExceptionDataAccessService();
 		storageExceptionDataAccessService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -145,7 +149,8 @@ public abstract class StorageServiceProvider {
 	 * @param cachedDataSer
 	 * @return Properly initialized {@link StorageInvocationDataAccessService}.
 	 */
-	public StorageInvocationDataAccessService createStorageInvocationDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public StorageInvocationDataAccessService createStorageInvocationDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<InvocationSequenceData> storageTreeComponent) {
 		StorageInvocationDataAccessService storageInvocationDataAccessService = createStorageInvocationDataAccessService();
 		storageInvocationDataAccessService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -172,7 +177,8 @@ public abstract class StorageServiceProvider {
 	 *            Agents related to storage.
 	 * @return Properly initialized {@link StorageGlobalDataAccessService}.
 	 */
-	public StorageGlobalDataAccessService createStorageGlobalDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public StorageGlobalDataAccessService createStorageGlobalDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<DefaultData> storageTreeComponent, List<PlatformIdent> platformIdents) {
 		StorageGlobalDataAccessService storageGlobalDataAccessService = createStorageGlobalDataAccessService();
 		storageGlobalDataAccessService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -198,7 +204,8 @@ public abstract class StorageServiceProvider {
 	 *            Indexing tree.
 	 * @return Properly initialized {@link StorageJmxDataAccessService}.
 	 */
-	public StorageJmxDataAccessService createStorageJmxDataAccessService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public StorageJmxDataAccessService createStorageJmxDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<JmxSensorValueData> storageTreeComponent) {
 		StorageJmxDataAccessService storageJmxDataAccessService = createStorageJmxDataAccessService();
 		storageJmxDataAccessService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -223,9 +230,11 @@ public abstract class StorageServiceProvider {
 	 *            Indexing tree.
 	 * @param businessTransactions
 	 *            a collection of {@link BusinessTransactionData} instances.
-	 * @return The storage implementation of the {@link IBusinessContextManagementService}
+	 * @return The storage implementation of the
+	 *         {@link IBusinessContextManagementService}
 	 */
-	public IBusinessContextManagementService createStorageBusinessContextService(StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+	public IBusinessContextManagementService createStorageBusinessContextService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
 			IStorageTreeComponent<DefaultData> indexingTree, Collection<BusinessTransactionData> businessTransactions) {
 		StorageBusinessContextService storageBusinessContextService = createStorageBusinessContextService();
 		storageBusinessContextService.setStorageRepositoryDefinition(storageRepositoryDefinition);
@@ -234,7 +243,6 @@ public abstract class StorageServiceProvider {
 		storageBusinessContextService.setBusinessTransactions(businessTransactions);
 		return storageBusinessContextService;
 	}
-
 	/**
 	 * @return Spring created {@link StorageSpanService}.
 	 */
@@ -257,5 +265,31 @@ public abstract class StorageServiceProvider {
 		storageSpanService.setLocalStorageData(localStorageData);
 		storageSpanService.setIndexingTree(indexingTree);
 		return storageSpanService;
+	}
+	/**
+	 * @return Spring created {@link StorageProblemOccurrenceDataAccessService}.
+	 */
+	protected abstract StorageProblemOccurrenceDataAccessService createStorageProblemOccurrenceDataAccessService();
+
+	/**
+	 * Properly initialized {@link StorageProblemOccurrenceDataAccessService}.
+	 * 
+	 * @param storageRepositoryDefinition
+	 *            {@link StorageRepositoryDefinition}.
+	 * @param localStorageData
+	 *            {@link LocalStorageData}.
+	 * @param indexingTree
+	 *            Indexing tree.
+	 * @return The storage implementation of the
+	 *         {@link IProblemOccurrenceDataAccessService}
+	 */
+	public IProblemOccurrenceDataAccessService createStorageProblemOccurrenceDataAccessService(
+			StorageRepositoryDefinition storageRepositoryDefinition, LocalStorageData localStorageData,
+			IStorageTreeComponent<ProblemOccurrence> indexingTree) {
+		StorageProblemOccurrenceDataAccessService storageProblemOccurrenceDataAccessService = createStorageProblemOccurrenceDataAccessService();
+		storageProblemOccurrenceDataAccessService.setStorageRepositoryDefinition(storageRepositoryDefinition);
+		storageProblemOccurrenceDataAccessService.setLocalStorageData(localStorageData);
+		storageProblemOccurrenceDataAccessService.setIndexingTree(indexingTree);
+		return storageProblemOccurrenceDataAccessService;
 	}
 }

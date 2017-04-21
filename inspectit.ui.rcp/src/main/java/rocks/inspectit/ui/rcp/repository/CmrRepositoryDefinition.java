@@ -16,6 +16,7 @@ import rocks.inspectit.shared.cs.cmr.service.IHttpTimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IInfluxDBService;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IJmxDataAccessService;
+import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IServerStatusService;
 import rocks.inspectit.shared.cs.cmr.service.IServerStatusService.ServerStatus;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
@@ -239,6 +240,11 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	private List<CmrRepositoryChangeListener> cmrRepositoryChangeListeners = new ArrayList<>(1);
 
 	/**
+	 * ProblemOccurrenceDataAccessService
+	 */
+	private IProblemOccurrenceDataAccessService problemOccurrenceDataAccessService;
+
+	/**
 	 * Calls default constructor with name 'Undefined'.
 	 *
 	 * @param ip
@@ -284,7 +290,7 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		alertAccessService = cmrServiceProvider.getAlertAccessService(this);
 		agentInstrumentationService = cmrServiceProvider.getAgentInstrumentationService(this);
 		spanService = new CachedSpanService(cmrServiceProvider.getSpanService(this));
-
+		problemOccurrenceDataAccessService = cmrServiceProvider.getProblemOccurrenceDataAccessService(this);
 		cachedDataService = new RefreshEditorsCachedDataService(globalDataAccessService, businessContextManagementService, this);
 	}
 
@@ -420,6 +426,15 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		return agentInstrumentationService;
 	}
 
+	/**
+	 * Returns the {@link IProblemOccurrenceDataAccessService}.
+	 * 
+	 * @return the {@link IProblemOccurrenceDataAccessService}.
+	 */
+	@Override
+	public IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService() {
+		return problemOccurrenceDataAccessService;
+	}
 	/**
 	 * {@inheritDoc}
 	 */
@@ -645,4 +660,5 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 	public String toString() {
 		return "Repository definition :: Name=" + name + " IP=" + ip + " Port=" + port;
 	}
+
 }

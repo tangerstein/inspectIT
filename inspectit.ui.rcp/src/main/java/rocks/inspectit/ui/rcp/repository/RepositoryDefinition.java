@@ -8,6 +8,7 @@ import rocks.inspectit.shared.cs.cmr.service.IHttpTimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.IJmxDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ISpanService;
+import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ISqlDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ITimerDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.cache.CachedSpanService;
@@ -100,6 +101,7 @@ public interface RepositoryDefinition {
 	/**
 	 * Returns the {@link IBusinessContextManagementService}.
 	 *
+	 * 
 	 * @return Returns the {@link IBusinessContextManagementService}.
 	 */
 	IBusinessContextManagementService getBusinessContextMangementService();
@@ -110,4 +112,11 @@ public interface RepositoryDefinition {
 	 * @return Returns the {@link CachedSpanService}.
 	 */
 	ISpanService getSpanService();
+	
+	/**
+	 * Returns the {@link IProblemOccurrenceDataAccessService}.
+	 * 
+	 * @return the {@link IProblemOccurrenceDataAccessService}.
+	 */
+	IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService();q
 }
