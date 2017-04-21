@@ -39,7 +39,7 @@ public class InvocationIdentifier implements Serializable {
 	 * Representation of relevant timerData.
 	 */
 	@JsonProperty(value = "timerDataProblemOccurence")
-	private TimerDataProblemOccurence timerDataProblemOccurence;
+	private TimerDataProblemOccurrence timerDataProblemOccurence;
 
 	/**
 	 * Create new InvocationIdentifier based on InvocationSequenceData.
@@ -50,7 +50,7 @@ public class InvocationIdentifier implements Serializable {
 	public InvocationIdentifier(final InvocationSequenceData invocationSequenceData) {
 		this.methodIdent = invocationSequenceData.getMethodIdent();
 		this.invocationId = invocationSequenceData.getId();
-		this.timerDataProblemOccurence = new TimerDataProblemOccurence(invocationSequenceData);
+		this.timerDataProblemOccurence = new TimerDataProblemOccurrence(invocationSequenceData);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class InvocationIdentifier implements Serializable {
 	 *
 	 * @return {@link #timerDataProblemOccurence}
 	 */
-	public final TimerDataProblemOccurence getTimerDataProblemOccurence() {
+	public final TimerDataProblemOccurrence getTimerDataProblemOccurence() {
 		return this.timerDataProblemOccurence;
 	}
 

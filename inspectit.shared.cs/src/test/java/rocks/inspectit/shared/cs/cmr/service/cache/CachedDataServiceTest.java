@@ -59,6 +59,7 @@ public class CachedDataServiceTest extends TestBase {
 		private PlatformIdent platformIdent;
 		private static final long METHOD_SENSOR_ID = 20L;
 		private MethodIdent methodIdent;
+		private static final String METHOD_NAME = "methodName";
 		private static final long SENSOR_ID = 20L;
 		private SensorTypeIdent sensorType;
 
@@ -72,6 +73,7 @@ public class CachedDataServiceTest extends TestBase {
 
 			methodIdent = mock(MethodIdent.class);
 			when(methodIdent.getId()).thenReturn(METHOD_SENSOR_ID);
+			when(methodIdent.toString()).thenReturn(METHOD_NAME);
 			when(platformIdent.getMethodIdents()).thenReturn(Collections.singleton(methodIdent));
 
 			sensorType = mock(SensorTypeIdent.class);
@@ -84,6 +86,7 @@ public class CachedDataServiceTest extends TestBase {
 			assertThat(cachedDataService.getPlatformIdentForId(PLATFORM_ID), is(equalTo(platformIdent)));
 			assertThat(cachedDataService.getMethodIdentForId(METHOD_SENSOR_ID), is(equalTo(methodIdent)));
 			assertThat(cachedDataService.getSensorTypeIdentForId(SENSOR_ID), is(equalTo(sensorType)));
+			assertThat(cachedDataService.getIdForMethodName(METHOD_NAME), is(equalTo(METHOD_SENSOR_ID)));
 
 			verify(globalDataAccessService, times(1)).getAgentsOverview();
 			verify(globalDataAccessService, times(1)).getCompleteAgent(PLATFORM_ID);
@@ -112,6 +115,13 @@ public class CachedDataServiceTest extends TestBase {
 		private final int SECOND_APPLICATION_ID = 12378;
 		private final int THIRD_BUSINESS_TX_ID = 49978;
 
+		private final String FIRST_APPLICATION_NAME = "firstApplication";
+		private final String SECOND_APPLICATION_NAME = "secondApplication";
+
+		private final String FIRST_BUSINESS_TRANSACTION_NAME = "firstBusinessTx";
+		private final String SECOND_BUSINESS_TRANSACTION_NAME = "secondBusinessTx";
+		private final String THIRD_BUSINESS_TRANSACTION_NAME = "thirdBusinessTx";
+
 		private ApplicationData firstApplication;
 		private ApplicationData secondApplication;
 		private BusinessTransactionData firstBusinessTx;
@@ -120,12 +130,12 @@ public class CachedDataServiceTest extends TestBase {
 
 		@BeforeMethod
 		public void initialize() throws BusinessException {
-			firstApplication = new ApplicationData(FIRST_APPLICATION_ID, FIRST_APPLICATION_ID, "firstApplication");
-			firstBusinessTx = new BusinessTransactionData(FIRST_BUSINESS_TX_ID, FIRST_BUSINESS_TX_ID, firstApplication, "firstBusinessTx");
-			secondBusinessTx = new BusinessTransactionData(SECOND_BUSINESS_TX_ID, SECOND_BUSINESS_TX_ID, firstApplication, "secondBusinessTx");
+			firstApplication = new ApplicationData(FIRST_APPLICATION_ID, FIRST_APPLICATION_ID, FIRST_APPLICATION_NAME);
+			firstBusinessTx = new BusinessTransactionData(FIRST_BUSINESS_TX_ID, FIRST_BUSINESS_TX_ID, firstApplication, FIRST_BUSINESS_TRANSACTION_NAME);
+			secondBusinessTx = new BusinessTransactionData(SECOND_BUSINESS_TX_ID, SECOND_BUSINESS_TX_ID, firstApplication, SECOND_BUSINESS_TRANSACTION_NAME);
 
-			secondApplication = new ApplicationData(SECOND_APPLICATION_ID, SECOND_APPLICATION_ID, "secondApplication");
-			thirdBusinessTx = new BusinessTransactionData(THIRD_BUSINESS_TX_ID, THIRD_BUSINESS_TX_ID, secondApplication, "thirdBusinessTx");
+			secondApplication = new ApplicationData(SECOND_APPLICATION_ID, SECOND_APPLICATION_ID, SECOND_APPLICATION_NAME);
+			thirdBusinessTx = new BusinessTransactionData(THIRD_BUSINESS_TX_ID, THIRD_BUSINESS_TX_ID, secondApplication, THIRD_BUSINESS_TRANSACTION_NAME);
 
 			List<BusinessTransactionData> businessTxs = new ArrayList<>();
 			businessTxs.add(firstBusinessTx);
@@ -145,6 +155,11 @@ public class CachedDataServiceTest extends TestBase {
 			assertThat(cachedDataService.getBusinessTransactionForId(FIRST_APPLICATION_ID, FIRST_BUSINESS_TX_ID), is(equalTo(firstBusinessTx)));
 			assertThat(cachedDataService.getBusinessTransactionForId(FIRST_APPLICATION_ID, SECOND_BUSINESS_TX_ID), is(equalTo(secondBusinessTx)));
 			assertThat(cachedDataService.getBusinessTransactionForId(SECOND_APPLICATION_ID, THIRD_BUSINESS_TX_ID), is(equalTo(thirdBusinessTx)));
+			assertThat(cachedDataService.getIdForApplicationName(FIRST_APPLICATION_NAME), is(equalTo(FIRST_APPLICATION_ID)));
+			assertThat(cachedDataService.getIdForApplicationName(SECOND_APPLICATION_NAME), is(equalTo(SECOND_APPLICATION_ID)));
+			assertThat(cachedDataService.getIdForBusinessTransactionName(FIRST_BUSINESS_TRANSACTION_NAME), is(equalTo(FIRST_BUSINESS_TX_ID)));
+			assertThat(cachedDataService.getIdForBusinessTransactionName(SECOND_BUSINESS_TRANSACTION_NAME), is(equalTo(SECOND_BUSINESS_TX_ID)));
+			assertThat(cachedDataService.getIdForBusinessTransactionName(THIRD_BUSINESS_TRANSACTION_NAME), is(equalTo(THIRD_BUSINESS_TX_ID)));
 
 			verify(businessContextService, times(1)).getBusinessTransactions();
 			verify(businessContextService, times(1)).getApplications();
