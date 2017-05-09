@@ -32,6 +32,11 @@ public class InvocationSequenceDataIterator implements Iterator<InvocationSequen
 	private int nextDepth = 0;
 
 	/**
+	 * The {@link InvocationSequenceData} element determining the iteration end.
+	 */
+	private InvocationSequenceData iterationEnd;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param startFrom
@@ -58,13 +63,12 @@ public class InvocationSequenceDataIterator implements Iterator<InvocationSequen
 
 		this.nextElement = startFrom;
 
-		if (!onlySubTree) {
-			while (null != startFrom.getParentSequence()) {
-				nextDepth++;
-				startFrom = startFrom.getParentSequence();
-			}
-		}
+		iterationEnd = onlySubTree ? startFrom.getParentSequence() : null;
 
+		while (null != startFrom.getParentSequence()) {
+			nextDepth++;
+			startFrom = startFrom.getParentSequence();
+		}
 	}
 
 	/**
@@ -108,7 +112,7 @@ public class InvocationSequenceDataIterator implements Iterator<InvocationSequen
 	 * @return Returns the next element for iteration.
 	 */
 	private InvocationSequenceData findNext(InvocationSequenceData current, InvocationSequenceData child) {
-		if (current == null) { // NOPMD no equals on purpose
+		if (iterationEnd == current) { // NOPMD no equals on purpose
 			return null;
 		}
 
@@ -118,19 +122,10 @@ public class InvocationSequenceDataIterator implements Iterator<InvocationSequen
 			nextDepth--;
 			return findNext(current.getParentSequence(), current);
 		} else {
-			int childIndex = -1;
-			if (null != child) {
-				for (InvocationSequenceData childCandidate : nestedSequences) {
-					childIndex++;
-					if (childCandidate == child) { // NOPMD no equals on purpose
-						break;
-					}
-				}
-				if (childIndex >= nestedSequences.size()) {
-					throw new IllegalStateException("Parent list does not contain this child invocation sequence.");
-				}
+			int childIndex = nestedSequences.indexOf(child);
+			if (null != child && childIndex == -1) {
+				throw new IllegalStateException("Parent list does not contain this child invocation sequence.");
 			}
-
 			int nextIndex = childIndex + 1;
 			if (nextIndex < nestedSequences.size()) {
 				nextDepth++;
@@ -140,6 +135,7 @@ public class InvocationSequenceDataIterator implements Iterator<InvocationSequen
 				return findNext(current.getParentSequence(), current);
 			}
 		}
+
 	}
 
 	/**
