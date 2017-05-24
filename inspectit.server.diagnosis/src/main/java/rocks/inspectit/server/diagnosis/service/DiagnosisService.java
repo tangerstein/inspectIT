@@ -99,6 +99,7 @@ public class DiagnosisService implements IDiagnosisService, Runnable {
 	 *            Timeout of queue
 	 * @param queueCapacity
 	 *            Capacity of the queue
+	 * @param diagnosisCmrProcessor 
 	 */
 	public DiagnosisService(List<String> rulesPackages, int numberOfSessionWorker, long timeOut, int queueCapacity) {
 		this.rulesPackages = rulesPackages;
