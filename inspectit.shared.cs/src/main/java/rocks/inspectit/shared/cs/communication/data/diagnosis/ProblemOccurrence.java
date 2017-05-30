@@ -1,16 +1,26 @@
+/**
+ *
+ */
 package rocks.inspectit.shared.cs.communication.data.diagnosis;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
- * This class represents a problem that was detected by the rules applied to the DiagnosisEngine.
+ * This class represents a problem that was detected by the rules applied to the
+ * DiagnosisEngine.
  *
  * @author Alexander Wert, Christian Voegele
  *
  */
-public class ProblemOccurrence {
+public class ProblemOccurrence extends DefaultData {
+
+	/**
+	 * The serial version UID.
+	 */
+	private static final long serialVersionUID = 3470892613217620473L;
 
 	/**
 	 * InvocationIdentifier to the request root.
@@ -61,7 +71,8 @@ public class ProblemOccurrence {
 	}
 
 	/**
-	 * Constructor that creates new ProblemOccurence based on InvocationSequenceData.
+	 * Constructor that creates new ProblemOccurence based on
+	 * InvocationSequenceData.
 	 *
 	 * @param requestRoot
 	 *            root InvocationSequenceData
@@ -74,8 +85,9 @@ public class ProblemOccurrence {
 	 * @param causeStructure
 	 *            The causeStructure
 	 */
-	public ProblemOccurrence(final InvocationSequenceData requestRoot, final InvocationSequenceData globalContext, final InvocationSequenceData problemContext,
-			final RootCause rootCause, final CauseStructure causeStructure) {
+	public ProblemOccurrence(final InvocationSequenceData requestRoot, final InvocationSequenceData globalContext,
+			final InvocationSequenceData problemContext, final RootCause rootCause,
+			final CauseStructure causeStructure) {
 		this.businessTransactionNameIdent = requestRoot.getBusinessTransactionId();
 		this.applicationNameIdent = requestRoot.getApplicationId();
 		this.requestRoot = new InvocationIdentifier(requestRoot);
@@ -86,7 +98,8 @@ public class ProblemOccurrence {
 	}
 
 	/**
-	 * Constructor that creates new ProblemOccurence based on InvocationIdentifier.
+	 * Constructor that creates new ProblemOccurence based on
+	 * InvocationIdentifier.
 	 * 
 	 * @param requestRoot
 	 *            request root
@@ -103,7 +116,8 @@ public class ProblemOccurrence {
 	 * @param applicationNameIdent
 	 *            application id
 	 */
-	public ProblemOccurrence(InvocationIdentifier requestRoot, InvocationIdentifier globalContext, InvocationIdentifier problemContext, RootCause rootCause, CauseStructure causeStructure,
+	public ProblemOccurrence(InvocationIdentifier requestRoot, InvocationIdentifier globalContext,
+			InvocationIdentifier problemContext, RootCause rootCause, CauseStructure causeStructure,
 			int businessTransactionNameIdent, int applicationNameIdent) {
 		this.businessTransactionNameIdent = businessTransactionNameIdent;
 		this.applicationNameIdent = applicationNameIdent;

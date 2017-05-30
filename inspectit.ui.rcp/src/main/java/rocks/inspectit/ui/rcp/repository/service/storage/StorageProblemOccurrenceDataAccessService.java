@@ -3,9 +3,9 @@ package rocks.inspectit.ui.rcp.repository.service.storage;
 import java.util.Collection;
 import java.util.Date;
 
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure.CauseType;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
 import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
 import rocks.inspectit.shared.cs.indexing.query.factory.impl.ProblemOccurrenceQueryFactory;
 import rocks.inspectit.shared.cs.indexing.storage.IStorageTreeComponent;
 import rocks.inspectit.shared.cs.indexing.storage.impl.StorageIndexQuery;

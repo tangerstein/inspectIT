@@ -89,11 +89,6 @@ import rocks.inspectit.shared.all.communication.data.eum.ClickAction;
 import rocks.inspectit.shared.all.communication.data.eum.PageLoadAction;
 import rocks.inspectit.shared.all.communication.data.eum.PageLoadRequest;
 import rocks.inspectit.shared.all.communication.data.eum.ResourceLoadRequest;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.InvocationIdentifier;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.RootCause;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.TimerDataProblemOccurrence;
 import rocks.inspectit.shared.all.communication.data.eum.UserAction;
 import rocks.inspectit.shared.all.communication.data.eum.UserSessionInfo;
 import rocks.inspectit.shared.all.exception.BusinessException;
@@ -144,7 +139,12 @@ import rocks.inspectit.shared.all.tracing.data.SpanIdent;
 import rocks.inspectit.shared.all.util.IHibernateUtil;
 import rocks.inspectit.shared.all.util.KryoNetNetwork;
 import rocks.inspectit.shared.all.util.TimeFrame;
-
+// TODO dependency
+//import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure;
+//import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType;
+//import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
+//import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrenceDetail;
+//import rocks.inspectit.shared.cs.communication.data.diagnosis.RootCause;
 /**
  * Implementation of the {@link ISerializer} that uses Kryo library for serializing the objects.
  * <br>
@@ -283,11 +283,12 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 		kryo.register(ClassLoadingInformationData.class, new CustomCompatibleFieldSerializer<ClassLoadingInformationData>(kryo, ClassLoadingInformationData.class, schemaManager));
 		kryo.register(ParameterContentType.class, new EnumSerializer(ParameterContentType.class));
 		/** diagnoseIT results **/
-		kryo.register(ProblemOccurrence.class, new CustomCompatibleFieldSerializer<ProblemOccurrence>(kryo, ProblemOccurrence.class, schemaManager));
-		kryo.register(CauseStructure.class, new CustomCompatibleFieldSerializer<CauseStructure>(kryo, CauseStructure.class, schemaManager));
-		kryo.register(TimerDataProblemOccurrence.class, new CustomCompatibleFieldSerializer<TimerDataProblemOccurrence>(kryo, TimerDataProblemOccurrence.class, schemaManager));
-		kryo.register(InvocationIdentifier.class, new CustomCompatibleFieldSerializer<InvocationIdentifier>(kryo, InvocationIdentifier.class, schemaManager));
-		kryo.register(RootCause.class, new FieldSerializer<RootCause>(kryo, RootCause.class));
+		//TODO Dependency fehler
+//		kryo.register(ProblemOccurrence.class, new CustomCompatibleFieldSerializer<ProblemOccurrence>(kryo, ProblemOccurrence.class, schemaManager));
+//		kryo.register(CauseStructure.class, new CustomCompatibleFieldSerializer<CauseStructure>(kryo, CauseStructure.class, schemaManager));
+//		kryo.register(TimerDataProblemOccurrence.class, new CustomCompatibleFieldSerializer<TimerDataProblemOccurence>(kryo, TimerDataProblemOccurence.class, schemaManager));
+//		kryo.register(InvocationIdentifier.class, new CustomCompatibleFieldSerializer<InvocationIdentifier>(kryo, InvocationIdentifier.class, schemaManager));
+//		kryo.register(RootCause.class, new FieldSerializer<RootCause>(kryo, RootCause.class));
 
 		// aggregation classes
 		kryo.register(AggregatedExceptionSensorData.class, new InvocationAwareDataSerializer<AggregatedExceptionSensorData>(kryo, AggregatedExceptionSensorData.class, schemaManager));

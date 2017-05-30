@@ -112,11 +112,11 @@ public interface RepositoryDefinition {
 	 * @return Returns the {@link CachedSpanService}.
 	 */
 	ISpanService getSpanService();
-	
-	/**
-	 * Returns the {@link IProblemOccurrenceDataAccessService}.
-	 * 
-	 * @return the {@link IProblemOccurrenceDataAccessService}.
-	 */
-	IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService();q
+//TODO dependency
+//	/**
+//	 * Returns the {@link IProblemOccurrenceDataAccessService}.
+//	 * 
+//	 * @return the {@link IProblemOccurrenceDataAccessService}.
+//	 */
+//	IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService();
 }

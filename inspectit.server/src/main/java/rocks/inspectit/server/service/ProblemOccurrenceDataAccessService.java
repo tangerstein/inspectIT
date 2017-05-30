@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import rocks.inspectit.server.diagnosis.results.IDiagnosisResults;
 import rocks.inspectit.server.spring.aop.MethodLog;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure.CauseType;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;

@@ -1,10 +1,13 @@
 package rocks.inspectit.server.diagnosis.results;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
 
 
@@ -33,7 +36,22 @@ public class DiagnosisResults implements IDiagnosisResults<ProblemOccurrence> {
 	 */
 	@Override
 	public final Set<ProblemOccurrence> getDiagnosisResults() {
-		return this.resultingSet.getHashSetCopy();
+		return this.resultingSet;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public final Set<ProblemOccurrence> getDiagnosisResults(IIndexQuery query) {
+		Set<ProblemOccurrence> filteredProblemOccurrences = new HashSet<ProblemOccurrence>();
+		for (ProblemOccurrence problemOccurrence : resultingSet) {
+			if (problemOccurrence.isQueryComplied(query)) {
+				filteredProblemOccurrences.add(problemOccurrence);
+			}
+		}
+		return filteredProblemOccurrences;
+
+}
 
 }

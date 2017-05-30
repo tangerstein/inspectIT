@@ -6,9 +6,9 @@ import java.util.Date;
 
 import org.springframework.stereotype.Component;
 
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure.CauseType;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
 import rocks.inspectit.shared.cs.indexing.query.factory.AbstractQueryFactory;
 import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
 

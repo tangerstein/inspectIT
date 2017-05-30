@@ -1,4 +1,4 @@
-package rocks.inspectit.shared.all.communication.data.diagnosis.results;
+package rocks.inspectit.shared.cs.communication.data.diagnosis;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 

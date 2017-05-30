@@ -2,7 +2,7 @@ package rocks.inspectit.server.diagnosis.results;
 
 import java.util.Collection;
 
-Qimport rocks.inspectit.shared.all.indexing.IIndexQuery;
+import rocks.inspectit.shared.all.indexing.IIndexQuery;
 
 /**
  * Interface of DiagnosisResults storage.

@@ -426,15 +426,16 @@ public class CmrRepositoryDefinition implements RepositoryDefinition, ICmrReposi
 		return agentInstrumentationService;
 	}
 
-	/**
-	 * Returns the {@link IProblemOccurrenceDataAccessService}.
-	 * 
-	 * @return the {@link IProblemOccurrenceDataAccessService}.
-	 */
-	@Override
-	public IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService() {
-		return problemOccurrenceDataAccessService;
-	}
+//  TODO dependency	
+//	/**
+//	 * Returns the {@link IProblemOccurrenceDataAccessService}.
+//	 * 
+//	 * @return the {@link IProblemOccurrenceDataAccessService}.
+//	 */
+//	@Override
+//	public IProblemOccurrenceDataAccessService getProblemOccurrenceDataAccessService() {
+//		return problemOccurrenceDataAccessService;
+//	}
 	/**
 	 * {@inheritDoc}
 	 */

@@ -8,8 +8,8 @@ import rocks.inspectit.shared.all.cmr.service.ServiceExporterType;
 import rocks.inspectit.shared.all.cmr.service.ServiceInterface;
 import rocks.inspectit.shared.all.communication.data.cmr.ApplicationData;
 import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure.CauseType;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
 
 /**
  * Service interface which defines the methods to retrieve data objects based on

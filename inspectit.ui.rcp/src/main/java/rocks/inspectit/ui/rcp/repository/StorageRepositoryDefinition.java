@@ -12,7 +12,6 @@ import rocks.inspectit.shared.all.communication.data.HttpTimerData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.communication.data.JmxSensorValueData;
 import rocks.inspectit.shared.all.communication.data.SqlStatementData;
-import rocks.inspectit.shared.all.communication.data.TimerData;
 import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData;
 import rocks.inspectit.shared.all.tracing.data.AbstractSpan;
 import rocks.inspectit.shared.cs.cmr.service.IBusinessContextManagementService;
@@ -243,16 +242,19 @@ public class StorageRepositoryDefinition implements RepositoryDefinition {
 				localStorageData, (IStorageTreeComponent<InvocationSequenceData>) indexingTree);
 		sqlDataAccessService = storageServiceProvider.createStorageSqlDataAccessService(this, localStorageData,
 				(IStorageTreeComponent<SqlStatementData>) indexingTree);
-		spanService = new CachedSpanService(storageServiceProvider.createStorageSpanService(this, localStorageData, (IStorageTreeComponent<AbstractSpan>) indexingTree));
-				(IStorageTreeComponent<TimerData>) indexingTree);
+		spanService = new CachedSpanService(storageServiceProvider.createStorageSpanService(this, localStorageData,
+				(IStorageTreeComponent<AbstractSpan>) indexingTree));
 		httpTimerDataAccessService = storageServiceProvider.createStorageHttpTimerDataAccessService(this,
 				localStorageData, (IStorageTreeComponent<HttpTimerData>) indexingTree);
 		jmxDataAccessService = storageServiceProvider.createStorageJmxDataAccessService(this, localStorageData,
 				(IStorageTreeComponent<JmxSensorValueData>) indexingTree);
 		businessContextService = storageServiceProvider.createStorageBusinessContextService(this, localStorageData,
 				(IStorageTreeComponent<DefaultData>) indexingTree, businessTransactions);
-		problemOccurrenceDataAccessService = storageServiceProvider.createStorageProblemOccurrenceDataAccessService(
-				this, localStorageData, (IStorageTreeComponent<ProblemOccurrence>) indexingTree);
+		// TODO dependency
+		// problemOccurrenceDataAccessService =
+		// storageServiceProvider.createStorageProblemOccurrenceDataAccessService(
+		// this, localStorageData, (IStorageTreeComponent<ProblemOccurrence>)
+		// indexingTree);
 
 		// for storage we use the regular cached data service because ids can
 		// never change

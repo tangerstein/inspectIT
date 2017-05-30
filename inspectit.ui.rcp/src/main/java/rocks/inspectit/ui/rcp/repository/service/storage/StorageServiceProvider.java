@@ -15,6 +15,8 @@ import rocks.inspectit.shared.all.communication.data.cmr.BusinessTransactionData
 import rocks.inspectit.shared.all.tracing.data.AbstractSpan;
 import rocks.inspectit.shared.cs.cmr.service.IBusinessContextManagementService;
 import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
+import rocks.inspectit.shared.cs.cmr.service.ISpanService;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
 import rocks.inspectit.shared.cs.indexing.storage.IStorageTreeComponent;
 import rocks.inspectit.shared.cs.storage.LocalStorageData;
 import rocks.inspectit.ui.rcp.repository.StorageRepositoryDefinition;

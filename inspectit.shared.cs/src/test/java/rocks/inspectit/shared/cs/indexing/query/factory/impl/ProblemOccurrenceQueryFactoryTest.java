@@ -12,10 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.testng.annotations.Test;
 
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure.CauseType;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
 import rocks.inspectit.shared.all.indexing.IIndexQuery;
 import rocks.inspectit.shared.all.testbase.TestBase;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
 import rocks.inspectit.shared.cs.indexing.impl.IndexQuery;
 import rocks.inspectit.shared.cs.indexing.query.provider.impl.IndexQueryProvider;
 import rocks.inspectit.shared.cs.indexing.restriction.impl.IndexQueryRestrictionFactory;
@@ -75,7 +75,7 @@ public class ProblemOccurrenceQueryFactoryTest extends TestBase {
 
 			// Method call
 			IIndexQuery query = problemOccurrenceQueryFactory.getProblemOccurrencesBasedOnInvocationIds(0L,
-					new Date(1000), new Date(1010), 1L, 1L, 1L, 1L, CauseType.RECURSIVE, 2, 3);
+					new Date(1000), new Date(1010), 1L, 1L, 1L, 1L, rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType.RECURSIVE, 2, 3);
 
 			// Configure expected query
 			IIndexQuery expectedQuery = new IndexQuery();
@@ -85,13 +85,13 @@ public class ProblemOccurrenceQueryFactoryTest extends TestBase {
 			expectedQuery.addIndexingRestriction(IndexQueryRestrictionFactory.equal("problemContext.invocationId", 1L));
 			expectedQuery.addIndexingRestriction(IndexQueryRestrictionFactory.equal("globalContext.invocationId", 1L));
 			expectedQuery.addIndexingRestriction(
-					IndexQueryRestrictionFactory.equal("causeStructure.causeType", CauseType.RECURSIVE));
+					IndexQueryRestrictionFactory.equal("causeStructure.causeType", rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType.RECURSIVE));
 			expectedQuery.addIndexingRestriction(IndexQueryRestrictionFactory.equal("applicationNameIdent", 2));
 			expectedQuery.addIndexingRestriction(IndexQueryRestrictionFactory.equal("businessTransactionNameIdent", 3));
 			expectedQuery.setFromDate(new Timestamp(1000));
 			expectedQuery.setToDate(new Timestamp(1010));
 			ArrayList<Class<?>> searchedClasses = new ArrayList<Class<?>>();
-			searchedClasses.add(ProblemOccurrence.class);
+			searchedClasses.add(rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence.class);
 			expectedQuery.setObjectClasses(searchedClasses);
 
 			assertThat(query, is(expectedQuery));

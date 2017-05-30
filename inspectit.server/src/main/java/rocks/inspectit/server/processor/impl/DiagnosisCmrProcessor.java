@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import rocks.inspectit.server.diagnosis.results.IDiagnosisResults;
 import rocks.inspectit.server.diagnosis.service.IDiagnosisResultNotificationService;
 import rocks.inspectit.server.diagnosis.service.IDiagnosisService;
 import rocks.inspectit.server.diagnosis.service.rules.CachedDataMapper;
@@ -37,6 +38,12 @@ public class DiagnosisCmrProcessor extends AbstractCmrDataProcessor implements I
 	 */
 	@Autowired(required = false)
 	private IDiagnosisService diagnosisService;
+	
+	/**
+	 * Diagnosis results repository.
+	 */
+	@Autowired
+	private IDiagnosisResults<ProblemOccurrence> diagnosisResults;
 
 	/**
 	 * Baseline value.
@@ -75,7 +82,7 @@ public class DiagnosisCmrProcessor extends AbstractCmrDataProcessor implements I
 	 */
 	@Override
 	public void onNewDiagnosisResult(ProblemOccurrence problemOccurrence) {
-		// diagnosisResults.getDiagnosisResults().add(problemOccurrence);
+		diagnosisResults.getDiagnosisResults().add(problemOccurrence);
 		countProblems++;
 		printProblemOccurence(problemOccurrence);
 	}
@@ -85,7 +92,7 @@ public class DiagnosisCmrProcessor extends AbstractCmrDataProcessor implements I
 	 */
 	@Override
 	public void onNewDiagnosisResult(Collection<ProblemOccurrence> problemOccurrences) {
-		// diagnosisResults.getDiagnosisResults().addAll(problemOccurrences);
+		diagnosisResults.getDiagnosisResults().addAll(problemOccurrences);
 		countProblems = countProblems + problemOccurrences.size();
 		for (ProblemOccurrence problemOccurrence : problemOccurrences) {
 			printProblemOccurence(problemOccurrence);

@@ -22,10 +22,10 @@ import org.springframework.web.servlet.ModelAndView;
 import rocks.inspectit.server.service.rest.error.JsonError;
 import rocks.inspectit.shared.all.cmr.model.MethodIdent;
 import rocks.inspectit.shared.all.cmr.service.ICachedDataService;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.CauseStructure.CauseType;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrence;
-import rocks.inspectit.shared.all.communication.data.diagnosis.results.ProblemOccurrenceDetail;
 import rocks.inspectit.shared.cs.cmr.service.IProblemOccurrenceDataAccessService;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.CauseStructure.CauseType;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrence;
+import rocks.inspectit.shared.cs.communication.data.diagnosis.ProblemOccurrenceDetail;
 
 /**
  * Restful service provider for detail {@link ProblemOccurrence} information.
