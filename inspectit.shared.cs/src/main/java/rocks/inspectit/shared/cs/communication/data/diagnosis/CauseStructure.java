@@ -136,7 +136,11 @@ public class CauseStructure {
 		/**
 		 * The Cause Type is due to recursive calls to database..
 		 */
-		RECURSIVE_DATABASE
+		RECURSIVE_DATABASE,
+		/**
+		 * The Cause Type is due to N+1 calls to database..
+		 */
+		NPLUSONE_DATABASE;
 	}
 
 }
