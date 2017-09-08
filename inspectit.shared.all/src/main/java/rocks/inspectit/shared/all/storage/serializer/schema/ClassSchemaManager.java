@@ -7,6 +7,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 
 import rocks.inspectit.shared.all.spring.logger.Log;
@@ -74,6 +76,15 @@ public class ClassSchemaManager implements InitializingBean {
 			schemaMap.put(schema.getClassName(), schema);
 		}
 	}
+	
+	public ClassSchemaManager() {
+		try {
+			schemaListFile = new UrlResource(this.getClass().getClassLoader().getResource(SCHEMA_DIR+"/"+ SCHEMA_LIST_FILE).toString());
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Gets {@link ClassSchema} for a class name.
@@ -93,7 +104,7 @@ public class ClassSchemaManager implements InitializingBean {
 	 *             If {@link IOException} occurs.
 	 */
 	public void loadSchemasFromLocations() throws IOException {
-		log.info("||-Class Schema Manager started..");
+		//log.info("||-Class Schema Manager started..");
 
 		InputStream is = schemaListFile.getInputStream();
 		InputStreamReader isr = new InputStreamReader(is);
@@ -210,9 +221,9 @@ public class ClassSchemaManager implements InitializingBean {
 			}
 			ClassSchema schema = new ClassSchema(schemaInitMap);
 			this.addSchema(schema);
-			if (log.isDebugEnabled()) {
-				log.info("||-Successfully loaded schema for class " + schema.getClassName());
-			}
+//			if (log.isDebugEnabled()) {
+//				log.info("||-Successfully loaded schema for class " + schema.getClassName());
+//			}
 		}
 	}
 

@@ -157,8 +157,8 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 	/**
 	 * {@link KryoNetNetwork} for registering needed classes for communication.
 	 */
-	@Autowired
-	private KryoNetNetwork kryoNetNetwork;
+//	@Autowired
+//	private KryoNetNetwork kryoNetNetwork;
 
 	/**
 	 * Schema manager that holds all schemas for the {@link DefaultData} objects to be serialized.
@@ -323,7 +323,7 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 
 		// added with INSPECTIT-480
 		// needed for KryoNet
-		kryoNetNetwork.register(kryo);
+		//kryoNetNetwork.register(kryo);
 
 		// added with INSPECTIT-632
 		kryo.register(BusinessException.class, new FieldSerializer<BusinessException>(kryo, BusinessException.class));
@@ -454,15 +454,15 @@ public class SerializationManager implements ISerializer, IKryoProvider, Initial
 		this.schemaManager = schemaManager;
 	}
 
-	/**
-	 * Sets {@link #kryoNetNetwork}.
-	 *
-	 * @param kryoNetNetwork
-	 *            New value for {@link #kryoNetNetwork}
-	 */
-	public void setKryoNetNetwork(KryoNetNetwork kryoNetNetwork) {
-		this.kryoNetNetwork = kryoNetNetwork;
-	}
+//	/**
+//	 * Sets {@link #kryoNetNetwork}.
+//	 *
+//	 * @param kryoNetNetwork
+//	 *            New value for {@link #kryoNetNetwork}
+//	 */
+//	public void setKryoNetNetwork(KryoNetNetwork kryoNetNetwork) {
+//		this.kryoNetNetwork = kryoNetNetwork;
+//	}
 
 	/**
 	 * Gets {@link #kryo}.

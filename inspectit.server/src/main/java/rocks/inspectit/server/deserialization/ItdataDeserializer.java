@@ -2,6 +2,7 @@ package rocks.inspectit.server.deserialization;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,26 +19,25 @@ import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.spring.logger.Log;
 import rocks.inspectit.shared.all.storage.serializer.impl.SerializationManager;
 import rocks.inspectit.shared.all.storage.serializer.provider.SerializationManagerProvider;
+import rocks.inspectit.shared.all.storage.serializer.schema.ClassSchemaManager;
 import rocks.inspectit.shared.all.storage.serializer.util.KryoUtil;
 
 @Component
 public class ItdataDeserializer {
 
-	@Log
-	Logger log;
-
-	/**
-	 * Serialization manager provider.
-	 */
-	@Autowired
-	private SerializationManagerProvider serializationManagerProvider;
-
 	/**
 	 * Deserializes a given itdata file.
 	 */
-	@PostConstruct
-	public void deserializeInvocationSequences() {
-		SerializationManager serializer = serializationManagerProvider.createSerializer();
+	public static void deserializeInvocationSequences() {
+		SerializationManager serializer = new SerializationManager();
+		ClassSchemaManager classSchemaManager = new ClassSchemaManager();
+		try {
+			classSchemaManager.loadSchemasFromLocations();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		serializer.setSchemaManager(classSchemaManager);
+		serializer.initKryo();
 
 		List<InvocationSequenceData> receivedData = new ArrayList<InvocationSequenceData>();
 		String[] itdatas = new String[] {"-197127687.itdata", "-314493660.itdata"};
@@ -54,6 +54,10 @@ public class ItdataDeserializer {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		log.info("Finito");
+	}
+	
+	
+	public static void main(String[] args) {
+		ItdataDeserializer.deserializeInvocationSequences();
 	}
 }
