@@ -208,9 +208,13 @@ public class OPENxtraceDeserializer {
 				e.printStackTrace();
 			}
 			Callable callable = null;
-			if (node.get("rootOfSubtrace").get("@class").toString().equals("org.spec.research.open.xtrace.adapters.inspectit.impl.IITRemoteInvocation")) {
+			if (node.get("rootOfSubtrace").get("@class").asText().equals("org.spec.research.open.xtrace.adapters.inspectit.impl.IITRemoteInvocation")) {
 				callable = objectMapper.treeToValue(node.get("rootOfSubtrace"), IITRemoteInvocation.class);
+			} else if (node.get("rootOfSubtrace").get("@class").asText().equals("org.spec.research.open.xtrace.adapters.inspectit.impl.IITHTTPRequestProcessing")) {
+				callable = objectMapper.treeToValue(node.get("rootOfSubtrace"), IITHTTPRequestProcessing.class);
 			} else {
+				// There are also other cases, which should be covered, but they (hopefully) won't
+				// occur in the context of the planned experiments.
 				callable = objectMapper.treeToValue(node.get("rootOfSubtrace"), IITSpanCallable.class);
 			}
 			return new IITSubTraceImpl(containingTrace, identifier, callable);
