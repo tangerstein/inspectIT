@@ -2,8 +2,10 @@ package rocks.inspectit.server.open.xtrace;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonNode;
@@ -15,20 +17,29 @@ import org.codehaus.jackson.map.JsonDeserializer;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.spec.research.open.xtrace.adapters.inspectit.impl.IITAbstractCallable;
-import org.spec.research.open.xtrace.adapters.inspectit.impl.IITAbstractNestingCallable;
-import org.spec.research.open.xtrace.adapters.inspectit.impl.IITHTTPRequestProcessing;
-import org.spec.research.open.xtrace.adapters.inspectit.impl.IITRemoteInvocation;
-import org.spec.research.open.xtrace.adapters.inspectit.impl.IITSpanCallable;
-import org.spec.research.open.xtrace.adapters.inspectit.impl.IITSubTraceImpl;
-import org.spec.research.open.xtrace.adapters.inspectit.impl.IITTraceImpl;
+import org.codehaus.jackson.type.TypeReference;
+import org.diagnoseit.spike.inspectit.trace.impl.IITSubTraceImpl;
+import org.diagnoseit.spike.inspectit.trace.impl.IITTraceImpl;
+import org.spec.research.open.xtrace.api.core.AdditionalInformation;
 import org.spec.research.open.xtrace.api.core.SubTrace;
+import org.spec.research.open.xtrace.api.core.Trace;
+import org.spec.research.open.xtrace.api.core.UseCaseInvocation;
 import org.spec.research.open.xtrace.api.core.callables.Callable;
+import org.spec.research.open.xtrace.api.core.callables.HTTPMethod;
+import org.spec.research.open.xtrace.api.core.callables.HTTPRequestProcessing;
+import org.spec.research.open.xtrace.api.core.callables.MethodInvocation;
+import org.spec.research.open.xtrace.api.core.callables.RemoteInvocation;
+import org.spec.research.open.xtrace.dflt.impl.core.LocationImpl;
+import org.spec.research.open.xtrace.dflt.impl.core.SubTraceImpl;
+import org.spec.research.open.xtrace.dflt.impl.core.TraceImpl;
+import org.spec.research.open.xtrace.dflt.impl.core.callables.AbstractCallableImpl;
+import org.spec.research.open.xtrace.dflt.impl.core.callables.HTTPRequestProcessingImpl;
+import org.spec.research.open.xtrace.dflt.impl.core.callables.MethodInvocationImpl;
+import org.spec.research.open.xtrace.dflt.impl.core.callables.RemoteInvocationImpl;
+import org.spec.research.open.xtrace.dflt.impl.core.callables.UseCaseInvocationImpl;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-
-import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 
 /**
  * OPEN.xtrace deserializer.
@@ -40,45 +51,52 @@ public class OPENxtraceDeserializer {
 
 	ObjectMapper objectMapper;
 
+	TypeReference<ArrayList<String>> listTypRef = new TypeReference<ArrayList<String>>() {
+	};
+	TypeReference<HashMap<String, String>> mapTypRef = new TypeReference<HashMap<String, String>>() {
+	};
 	public OPENxtraceDeserializer() {
 		createObjectMapper();
 	}
 
-	/**
-	 * Sets missing cyclical references, which could not be serialized.
-	 * 
-	 * @param traceImpl
-	 *            trace.
-	 * @return trace including cyclical references.
-	 */
-	private IITTraceImpl setMissingReferences(IITTraceImpl traceImpl) {
-		traceImpl.getRoot().setContainingTrace(traceImpl);
-		IITSubTraceImpl subTraceImpl = (IITSubTraceImpl) traceImpl.getRoot();
-		setMissingReferencesInCallable((IITAbstractCallable) subTraceImpl.getRoot(), null, subTraceImpl);
-		return traceImpl;
-	}
-
-	/**
-	 * Set missing references in callable.
-	 * 
-	 * @param callable
-	 *            current callable
-	 * @param parent
-	 *            parent callable
-	 * @param subTraceImpl
-	 *            containing sub trace
-	 */
-	private void setMissingReferencesInCallable(Callable callable, IITAbstractNestingCallable parent, IITSubTraceImpl subTraceImpl) {
-		if (callable instanceof IITAbstractCallable) {
-			((IITAbstractCallable) callable).setContainingSubTrace((SubTrace) subTraceImpl);
-			((IITAbstractCallable) callable).setParent(parent);
-		}
-		if (callable instanceof IITAbstractNestingCallable) {
-			for (Callable childCallable : ((IITAbstractNestingCallable) callable).getCallees()) {
-				setMissingReferencesInCallable(childCallable, ((IITAbstractNestingCallable) callable), subTraceImpl);
-			}
-		}
-	}
+	// /**
+	// * Sets missing cyclical references, which could not be serialized.
+	// *
+	// * @param traceImpl
+	// * trace.
+	// * @return trace including cyclical references.
+	// */
+	// private TraceImpl setMissingReferences(TraceImpl traceImpl) {
+	// traceImpl.getRoot().getContainingTrace();
+	// IITSubTraceImpl subTraceImpl = (SubTraceImpl) traceImpl.getRoot();
+	// setMissingReferencesInCallable((AbstractCallable) subTraceImpl.getRoot(), null,
+	// subTraceImpl);
+	// return traceImpl;
+	// }
+	//
+	// /**
+	// * Set missing references in callable.
+	// *
+	// * @param callable
+	// * current callable
+	// * @param parent
+	// * parent callable
+	// * @param subTraceImpl
+	// * containing sub trace
+	// */
+	// private void setMissingReferencesInCallable(Callable callable, AbstractNestingCallableImpl
+	// parent, SubTraceImpl subTraceImpl) {
+	// if (callable instanceof IITAbstractCallable) {
+	// ((IITAbstractCallable) callable).setContainingSubTrace((SubTrace) subTraceImpl);
+	// ((IITAbstractCallable) callable).setParent(parent);
+	// }
+	// if (callable instanceof IITAbstractNestingCallable) {
+	// for (Callable childCallable : ((IITAbstractNestingCallable) callable).getCallees()) {
+	// setMissingReferencesInCallable(childCallable, ((IITAbstractNestingCallable) callable),
+	// subTraceImpl);
+	// }
+	// }
+	// }
 
 	/**
 	 * Deserializes JSON into a list of {@link IITTraceImpl}.
@@ -97,9 +115,10 @@ public class OPENxtraceDeserializer {
 
 		ArrayList<IITTraceImpl> resultList = new ArrayList<IITTraceImpl>();
 
-		for (JsonElement element : jsonTraceArray) {
-			resultList.add(setMissingReferences(objectMapper.readValue(element.toString(), IITTraceImpl.class)));
-		}
+		// for (JsonElement element : jsonTraceArray) {
+		// resultList.add(setMissingReferences(objectMapper.readValue(element.toString(),
+		// IITTraceImpl.class)));
+		// }
 
 		return resultList;
 	}
@@ -111,11 +130,13 @@ public class OPENxtraceDeserializer {
 		objectMapper = new ObjectMapper();
 
 		SimpleModule deserializationModule = new SimpleModule("", new Version(2, 3, 2, "Deserialization open.XTRACE"));
-		deserializationModule.addDeserializer(IITSpanCallable.class, new IITSpanCallableDeserializer());
-		deserializationModule.addDeserializer(IITTraceImpl.class, new IITTraceImplDeserializer());
-		deserializationModule.addDeserializer(IITSubTraceImpl.class, new IITSubTraceImplDeserializer());
-		deserializationModule.addDeserializer(IITRemoteInvocation.class, new IITRemoteInvocationDeserializer());
-		deserializationModule.addDeserializer(IITHTTPRequestProcessing.class, new IITHTTPRequestProcessingDeserializer());
+		deserializationModule.addDeserializer(UseCaseInvocation.class, new UseCaseInvocationSerializer());
+		deserializationModule.addDeserializer(Trace.class, new IITTraceImplDeserializer());
+		deserializationModule.addDeserializer(SubTrace.class, new SubTraceImplDeserializer());
+		deserializationModule.addDeserializer(RemoteInvocation.class, new RemoteInvocationDeserializer());
+		deserializationModule.addDeserializer(HTTPRequestProcessing.class, new HTTPRequestProcessingDeserializer());
+		deserializationModule.addDeserializer(MethodInvocation.class, new MethodInvocationDeserializer());
+
 
 		objectMapper.registerModule(deserializationModule);
 	}
@@ -128,38 +149,71 @@ public class OPENxtraceDeserializer {
 	 * @author Tobias Angerstein
 	 *
 	 */
-	class IITSpanCallableDeserializer extends JsonDeserializer<IITSpanCallable> {
+	class UseCaseInvocationSerializer extends JsonDeserializer<UseCaseInvocation> {
 
-		public IITSpanCallableDeserializer() {
+		public UseCaseInvocationSerializer() {
 			super();
 		}
 
 		@Override
-		public IITSpanCallable deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public UseCaseInvocation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			JsonNode node = jp.getCodec().readTree(jp);
-			InvocationSequenceData invocationSequence = objectMapper.treeToValue(node.get("invocationSequence"), InvocationSequenceData.class);
-			UUID identifier = objectMapper.treeToValue(node.get("identifier"), UUID.class);
-			IITSubTraceImpl containingTrace = null;
-			IITSpanCallable parent = null;
-			List<Callable> children = new ArrayList<Callable>();
+			UseCaseInvocationImpl useCaseInvocation = new UseCaseInvocationImpl(null, null, node.get("useCaseName").asText());
 			if (null != node.get("children")) {
 				for (JsonNode callableJson : node.get("children")) {
-					if (callableJson.get("@class").asText().equals("org.spec.research.open.xtrace.adapters.inspectit.impl.IITRemoteInvocation")) {
-						children.add(objectMapper.treeToValue(callableJson, IITRemoteInvocation.class));
-					} else if (callableJson.get("@class").asText().equals("org.spec.research.open.xtrace.adapters.inspectit.impl.IITHTTPRequestProcessing")) {
-						children.add(objectMapper.treeToValue(callableJson, IITHTTPRequestProcessing.class));
-					} else {
-						children.add(objectMapper.treeToValue(callableJson, IITSpanCallable.class));
+					if (callableJson.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.RemoteInvocation")) {
+						useCaseInvocation.addCallee(objectMapper.treeToValue(callableJson, RemoteInvocation.class));
+					} else if (callableJson.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.HTTPRequestProcessing")) {
+						useCaseInvocation.addCallee(objectMapper.treeToValue(callableJson, HTTPRequestProcessing.class));
+					} else if (callableJson.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.MethodInvocation")) {
+						useCaseInvocation.addCallee(objectMapper.treeToValue(callableJson, MethodInvocation.class));
+					} else if (callableJson.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.UseCaseInvocation")) {
+						useCaseInvocation.addCallee(objectMapper.treeToValue(callableJson, UseCaseInvocation.class));
 					}
 				}
 			}
 			try {
-				return new IITSpanCallable(containingTrace, identifier, parent, node.get("usecaseID").asLong(), node.get("usecaseName").asText(), node.get("sessionCookie").asText(), invocationSequence, children);
+				useCaseInvocation.setTimestamp(node.get("timeStamp").getLongValue());
+				Iterator<String> nodeIterator = node.getFieldNames();
+
+				// Add additional information
+				while (nodeIterator.hasNext()) {
+					String fieldName = nodeIterator.next();
+					if (fieldName.contains("additionalInformation")) {
+						useCaseInvocation.addAdditionalInformation(new AdditionalInformation() {
+
+							@Override
+							public Object getValue() {
+								try {
+									return objectMapper.treeToValue(node.get(fieldName), Object.class);
+								} catch (IOException e) {
+									e.printStackTrace();
+									return null;
+								}
+							}
+
+							@Override
+							public String getName() {
+								return fieldName.split("\\.")[1];
+							}
+						});
+					}
+				}
+				useCaseInvocation.setResponseTime(node.get("responseTime").getLongValue());
+				useCaseInvocation.setThreadID(node.get("threadID").getLongValue());
+				useCaseInvocation.setThreadName(node.get("threadName").asText());
+				useCaseInvocation.setIdentifier(objectMapper.treeToValue(node.get("identifier"), Object.class));
+
+				List<String> labels = objectMapper.readValue(node.get("labels"), listTypRef);
+				for (String label : labels) {
+					useCaseInvocation.addLabel(label);
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
 			}
+			return useCaseInvocation;
 		}
 	}
 
@@ -169,18 +223,20 @@ public class OPENxtraceDeserializer {
 	 * @author Tobias Angerstein
 	 *
 	 */
-	class IITTraceImplDeserializer extends JsonDeserializer<IITTraceImpl> {
+	class IITTraceImplDeserializer extends JsonDeserializer<Trace> {
 
 		public IITTraceImplDeserializer() {
 			super();
 		}
 
 		@Override
-		public IITTraceImpl deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public TraceImpl deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			JsonNode node = jp.getCodec().readTree(jp);
-			Long identifier = node.get("identifier").asLong();
-			IITSubTraceImpl subTrace = objectMapper.treeToValue(node.get("rootOfTrace"), IITSubTraceImpl.class);
-			return new IITTraceImpl(identifier, subTrace);
+			SubTraceImpl subTrace = objectMapper.treeToValue(node.get("rootOfTrace"), SubTraceImpl.class);
+			TraceImpl traceImpl = new TraceImpl(node.get("traceID").getLongValue());
+			traceImpl.setIdentifier(objectMapper.treeToValue(node.get("identifier"), Object.class));
+			traceImpl.setRoot(subTrace);
+			return traceImpl;
 		}
 	}
 
@@ -190,81 +246,250 @@ public class OPENxtraceDeserializer {
 	 * @author Tobias Angerstein
 	 *
 	 */
-	class IITSubTraceImplDeserializer extends JsonDeserializer<IITSubTraceImpl> {
+	class SubTraceImplDeserializer extends JsonDeserializer<SubTrace> {
 
-		public IITSubTraceImplDeserializer() {
+		public SubTraceImplDeserializer() {
 			super();
 		}
 
 		@Override
-		public IITSubTraceImpl deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public SubTrace deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			JsonNode node = jp.getCodec().readTree(jp);
-			IITTraceImpl containingTrace = null;
-			Long identifier = null;
-			try {
-				identifier = node.get("identifier").asLong();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			JsonNode callableNode = node.get("rootOfSubtrace");
 			Callable callable = null;
-			if (node.get("rootOfSubtrace").get("@class").asText().equals("org.spec.research.open.xtrace.adapters.inspectit.impl.IITRemoteInvocation")) {
-				callable = objectMapper.treeToValue(node.get("rootOfSubtrace"), IITRemoteInvocation.class);
-			} else if (node.get("rootOfSubtrace").get("@class").asText().equals("org.spec.research.open.xtrace.adapters.inspectit.impl.IITHTTPRequestProcessing")) {
-				callable = objectMapper.treeToValue(node.get("rootOfSubtrace"), IITHTTPRequestProcessing.class);
-			} else {
-				// There are also other cases, which should be covered, but they (hopefully) won't
-				// occur in the context of the planned experiments.
-				callable = objectMapper.treeToValue(node.get("rootOfSubtrace"), IITSpanCallable.class);
+			if (callableNode.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.RemoteInvocation")) {
+				callable = objectMapper.treeToValue(callableNode, RemoteInvocation.class);
+			} else if (callableNode.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.HTTPRequestProcessing")) {
+				callable = objectMapper.treeToValue(callableNode, HTTPRequestProcessing.class);
+			} else if (callableNode.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.MethodInvocation")) {
+				callable = objectMapper.treeToValue(callableNode, MethodInvocation.class);
+			} else if (callableNode.get("@class").asText().equals("org.spec.research.open.xtrace.api.core.callables.UseCaseInvocation")) {
+				callable = objectMapper.treeToValue(callableNode, UseCaseInvocation.class);
 			}
-			return new IITSubTraceImpl(containingTrace, identifier, callable);
+			SubTraceImpl subTraceImpl = new SubTraceImpl(node.get("subTraceId").getLongValue(), null, null);
+			subTraceImpl.setIdentifier(objectMapper.treeToValue(node.get("identifier"), Object.class));
+			TypeReference<ArrayList<SubTrace>> subTraceListType = new TypeReference<ArrayList<SubTrace>>() {
+			};
+			List<SubTraceImpl> childSubTraces = objectMapper.readValue(node.get("subtraces"), subTraceListType);
+
+			// Add SubTraces
+			for (SubTraceImpl childSubTrace : childSubTraces) {
+				subTraceImpl.addSubTrace(childSubTrace);
+			}
+			subTraceImpl.setRoot((AbstractCallableImpl) callable);
+
+			// Add location
+			LocationImpl location = new LocationImpl(node.get("host").asText(), node.get("runtimeEnvironment").getTextValue(), node.get("application").getTextValue(), node.get("businessTransaction").getTextValue());
+			location.setNodeType(node.get("nodeType").asText());
+			location.setServerName(node.get("serverName").getTextValue());
+			subTraceImpl.setLocation(location);
+
+			return subTraceImpl;
 		}
 	}
 
 	/**
-	 * Deserializes {@link IITRemoteInvocation}
+	 * Deserializes {@link RemoteInvocation}
 	 * 
 	 * @author Tobias Angerstein
 	 *
 	 */
-	class IITRemoteInvocationDeserializer extends JsonDeserializer<IITRemoteInvocation> {
+	class RemoteInvocationDeserializer extends JsonDeserializer<RemoteInvocation> {
 
-		public IITRemoteInvocationDeserializer() {
+		public RemoteInvocationDeserializer() {
 			super();
 		}
 
 		@Override
-		public IITRemoteInvocation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public RemoteInvocation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			JsonNode node = jp.getCodec().readTree(jp);
-			InvocationSequenceData invocationSequence = objectMapper.treeToValue(node.get("invocationSequence"), InvocationSequenceData.class);
-			IITSubTraceImpl containingTrace = null;
-			IITSpanCallable parent = null;
-			IITRemoteInvocation remoteInvocation = new IITRemoteInvocation(invocationSequence, containingTrace, parent);
-			remoteInvocation.setTargetSubTrace(objectMapper.treeToValue(node.get("targetSubTrace"), IITSubTraceImpl.class));
-			return remoteInvocation;
+			RemoteInvocationImpl remoteInvocationImpl = new RemoteInvocationImpl(null, null);
+			remoteInvocationImpl.setTimestamp(node.get("timeStamp").getLongValue());
+			Iterator<String> nodeIterator = node.getFieldNames();
+
+			// Add additional information
+			while (nodeIterator.hasNext()) {
+				String fieldName = nodeIterator.next();
+				if (fieldName.contains("additionalInformation")) {
+					remoteInvocationImpl.addAdditionalInformation(new AdditionalInformation() {
+
+						@Override
+						public Object getValue() {
+							try {
+								return objectMapper.treeToValue(node.get(fieldName), Object.class);
+							} catch (IOException e) {
+								e.printStackTrace();
+								return null;
+							}
+						}
+
+						@Override
+						public String getName() {
+							return fieldName.split("\\.")[1];
+						}
+					});
+				}
+			}
+			remoteInvocationImpl.setResponseTime(node.get("responseTime").getLongValue());
+			remoteInvocationImpl.setThreadID(node.get("threadID").getLongValue());
+			remoteInvocationImpl.setThreadName(node.get("threadName").asText());
+			remoteInvocationImpl.setIdentifier(objectMapper.treeToValue(node.get("identifier"), Object.class));
+
+			List<String> labels = objectMapper.readValue(node.get("labels"), listTypRef);
+			for (String label : labels) {
+				remoteInvocationImpl.addLabel(label);
+			}
+
+			remoteInvocationImpl.setTargetSubTrace((SubTraceImpl) objectMapper.treeToValue(node.get("targetSubTrace"), SubTrace.class));
+
+			return remoteInvocationImpl;
 		}
 	}
 
 	/**
-	 * Deserializes {@link IITHTTPRequestProcessing}
+	 * Deserializes {@link HTTPRequestProcessing}
 	 * 
 	 * @author Tobias Angerstein
 	 *
 	 */
-	class IITHTTPRequestProcessingDeserializer extends JsonDeserializer<IITHTTPRequestProcessing> {
+	class HTTPRequestProcessingDeserializer extends JsonDeserializer<HTTPRequestProcessing> {
 
-		public IITHTTPRequestProcessingDeserializer() {
+		public HTTPRequestProcessingDeserializer() {
 			super();
 		}
 
 		@Override
-		public IITHTTPRequestProcessing deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public HTTPRequestProcessing deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			JsonNode node = jp.getCodec().readTree(jp);
-			InvocationSequenceData invocationSequence = objectMapper.treeToValue(node.get("invocationSequence"), InvocationSequenceData.class);
-			IITSubTraceImpl containingTrace = null;
-			IITSpanCallable parent = null;
-			IITHTTPRequestProcessing httpRequestProcessing = new IITHTTPRequestProcessing(invocationSequence, containingTrace, parent);
+			HTTPRequestProcessingImpl httpRequestProcessing = new HTTPRequestProcessingImpl(null, null);
+			httpRequestProcessing.setTimestamp(node.get("timeStamp").getLongValue());
+			Iterator<String> nodeIterator = node.getFieldNames();
+
+			// Add additional information
+			while (nodeIterator.hasNext()) {
+				String fieldName = nodeIterator.next();
+				if (fieldName.contains("additionalInformation")) {
+					httpRequestProcessing.addAdditionalInformation(new AdditionalInformation() {
+
+						@Override
+						public Object getValue() {
+							try {
+								return objectMapper.treeToValue(node.get(fieldName), Object.class);
+							} catch (IOException e) {
+								e.printStackTrace();
+								return null;
+							}
+						}
+
+						@Override
+						public String getName() {
+							return fieldName.split("\\.")[1];
+						}
+					});
+				}
+			}
+			httpRequestProcessing.setResponseTime(node.get("responseTime").getLongValue());
+			httpRequestProcessing.setThreadID(node.get("threadID").getLongValue());
+			httpRequestProcessing.setThreadName(node.get("threadName").asText());
+			httpRequestProcessing.setIdentifier(objectMapper.treeToValue(node.get("identifier"), Object.class));
+
+			// Add labels
+			List<String> labels = objectMapper.readValue(node.get("labels"), listTypRef);
+			for (String label : labels) {
+				httpRequestProcessing.addLabel(label);
+			}
+
+			httpRequestProcessing.setUri(node.get("uri").asText());
+
+
+			httpRequestProcessing.setResponseHTTPHeaders(objectMapper.readValue(node.get("responseHTTPHeaders"), mapTypRef));
+			httpRequestProcessing.setResponseCode(node.get("responseCode").getLongValue());
+			httpRequestProcessing.setRequestMethod(objectMapper.treeToValue(node.get("requestMethod"), HTTPMethod.class));
+			httpRequestProcessing.setHTTPAttributes(objectMapper.readValue(node.get("HTTPSessionAttributes"), mapTypRef));
+			httpRequestProcessing.setHTTPParameters(objectMapper.readValue(node.get("HTTPParameters"), mapTypRef));
+			httpRequestProcessing.setHTTPHeaders(objectMapper.readValue(node.get("HTTPHeaders"), mapTypRef));
+			httpRequestProcessing.setHTTPAttributes(objectMapper.readValue(node.get("HTTPAttributes"), mapTypRef));
+
 			return httpRequestProcessing;
+		}
+	}
+
+	/**
+	 * Deserializes {@link MethodInvocation}
+	 * 
+	 * @author Tobias Angerstein
+	 *
+	 */
+	class MethodInvocationDeserializer extends JsonDeserializer<MethodInvocation> {
+
+		public MethodInvocationDeserializer() {
+			super();
+		}
+
+		@Override
+		public MethodInvocation deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+			JsonNode node = jp.getCodec().readTree(jp);
+			MethodInvocationImpl methodInvocation = new MethodInvocationImpl(null, null);
+			methodInvocation.setTimestamp(node.get("timeStamp").getLongValue());
+			Iterator<String> nodeIterator = node.getFieldNames();
+
+			// Add additional information
+			while (nodeIterator.hasNext()) {
+				String fieldName = nodeIterator.next();
+				if (fieldName.contains("additionalInformation")) {
+					methodInvocation.addAdditionalInformation(new AdditionalInformation() {
+
+						@Override
+						public Object getValue() {
+							try {
+								return objectMapper.treeToValue(node.get(fieldName), Object.class);
+							} catch (IOException e) {
+								e.printStackTrace();
+								return null;
+							}
+						}
+
+						@Override
+						public String getName() {
+							return fieldName.split("\\.")[1];
+						}
+					});
+				}
+			}
+			methodInvocation.setResponseTime(node.get("responseTime").getLongValue());
+			methodInvocation.setThreadID(node.get("threadID").getLongValue());
+			methodInvocation.setThreadName(node.get("threadName").asText());
+			methodInvocation.setIdentifier(objectMapper.treeToValue(node.get("identifier"), Object.class));
+
+			// Add labels
+
+			List<String> labels = objectMapper.readValue(node.get("labels"), listTypRef);
+			for (String label : labels) {
+				methodInvocation.addLabel(label);
+			}
+
+			methodInvocation.setSyncTime(node.get("syncTime").getLongValue() == -1l ? Optional.empty() : Optional.of(node.get("syncTime").getLongValue()));
+			methodInvocation.setSignature(node.get("signature").asText());
+			methodInvocation.setReturnType(node.get("returnType").asText());
+			methodInvocation.setReturnValue(
+					objectMapper.treeToValue(node.get("returnValue"), Object.class) == null ? Optional.empty() : Optional.of(objectMapper.treeToValue(node.get("returnValue"), Object.class)));
+			
+			// Add parameterValues
+			TypeReference<HashMap<Integer, String>> mapTypRef = new TypeReference<HashMap<Integer, String>>() {
+			};
+			HashMap<Integer, String> parameterValues = objectMapper.readValue(node.get("parameterValues"), mapTypRef);
+			
+			for (Integer key : parameterValues.keySet()) {
+				methodInvocation.addParameterValue(key, parameterValues.get(key));
+			}
+			methodInvocation.setParameterTypes(objectMapper.readValue(node.get("parameterTypes"), listTypRef));
+			methodInvocation.setPackageName(node.get("packageName").asText());
+			methodInvocation.setMethodName(node.get("methodName").asText());
+			methodInvocation.setGCTime(node.get("GCTime").getLongValue() == -1l ? Optional.empty() : Optional.of(node.get("GCTime").getLongValue()));
+			methodInvocation.setCPUTime(node.get("CPUTime").getLongValue() == -1l ? Optional.empty() : Optional.of(node.get("CPUTime").getLongValue()));
+			methodInvocation.setClassName(node.get("className").asText());
+
+			return methodInvocation;
 		}
 	}
 }

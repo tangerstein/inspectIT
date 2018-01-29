@@ -63,7 +63,7 @@ public class OPENxtraceAccessService {
 			HashSet<Span> abstractSpans = new HashSet<Span>();
 			abstractSpans.addAll(spansService.getSpans(span.getSpanIdent().getTraceId()));
 			abstractSpans.add(span);
-			resultList.add(converter.convertTraces(listSequencesDetail, platformIdentList, new ArrayList<Span>(abstractSpans)));
+			resultList.add(converter.convertTrace(listSequencesDetail, platformIdentList, new ArrayList<Span>(abstractSpans)));
 		}
 		return resultList;
 	}
