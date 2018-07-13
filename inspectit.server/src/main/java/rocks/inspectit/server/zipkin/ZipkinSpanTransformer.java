@@ -26,6 +26,7 @@ import zipkin2.Span.Kind;
 public final class ZipkinSpanTransformer implements Transformer {
 
 	private static final String HTTP_URL = "http.url";
+
 	/**
 	 * Instance for usage.
 	 */
@@ -101,6 +102,10 @@ public final class ZipkinSpanTransformer implements Transformer {
 				span.addTag(ExtraTags.OPERATION_NAME, zipkinSpan.localServiceName() + ":" + zipkinSpan.tags().get(HTTP_URL));
 			}
 
+			span.addTag(ExtraTags.LOCAL_SERVICE_NAME, zipkinSpan.localServiceName());
+
+			span.addTag("http.request.method", zipkinSpan.name());
+
 			// tags
 			if (MapUtils.isNotEmpty(zipkinSpan.tags())) {
 				// TODO set propagation type
@@ -138,9 +143,15 @@ public final class ZipkinSpanTransformer implements Transformer {
 		span.setSpanIdent(ident);
 		span.setPropagationType(PropagationType.ZIPKIN);
 
+		long timestampMillis = -1;
+		double durationMillis = -1;
 		// transform to inspectIT way of time handling
-		long timestampMillis = zipkinSpan.timestamp / 1000;
-		double durationMillis = zipkinSpan.duration / 1000.0d;
+		if (null != zipkinSpan.timestamp) {
+			timestampMillis = zipkinSpan.timestamp / 1000;
+		}
+		if (null != zipkinSpan.duration) {
+			durationMillis = zipkinSpan.duration / 1000.0d;
+		}
 		span.setTimeStamp(new Timestamp(timestampMillis));
 		span.setDuration(durationMillis);
 
@@ -150,20 +161,26 @@ public final class ZipkinSpanTransformer implements Transformer {
 		}
 		// span.setReferenceType(zipkinSpan.context().getReferenceType());
 
+		String endpoint = "";
 		String operationName = "";
-
 		// operation name (we save as tag)
 		if (null != zipkinSpan.binaryAnnotations) {
+			endpoint += zipkinSpan.binaryAnnotations.get(0).endpoint.serviceName;
 			for (BinaryAnnotation annotation : zipkinSpan.binaryAnnotations) {
-				if (annotation.endpoint.serviceName != null) {
-					operationName += annotation.endpoint.serviceName;
-					break;
-				}
+				span.addTag(annotation.key, new String(annotation.value));
 			}
+
+			operationName = endpoint;
+
 			if (null != zipkinSpan.name) {
+				// Special shit
+				if (zipkinSpan.name.contains("/") && !span.getTags().containsKey("http.url")) {
+					span.addTag("http.url", "http://" + endpoint + ":80/" + zipkinSpan.name.split("/")[1]);
+				}
 				operationName += " (" + zipkinSpan.name + ")";
 			}
 			span.addTag(ExtraTags.OPERATION_NAME, operationName);
+			span.addTag(ExtraTags.LOCAL_SERVICE_NAME, endpoint);
 		}
 
 		// TODO what do we do about log data

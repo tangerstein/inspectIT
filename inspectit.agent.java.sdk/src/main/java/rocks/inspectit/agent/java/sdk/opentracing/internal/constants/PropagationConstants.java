@@ -33,9 +33,18 @@ public interface PropagationConstants {
 	 */
 	String INSPECTIT_BAGGAGE_PREFIX = INSPECTIT_PREFIX + "baggage_";
 
+	/**
+	 * Header name for the span id. in lower case
+	 */
 	String SPAN_ID_LOW = INSPECTIT_PREFIX + "Spanid";
 
+	/**
+	 * Header name for the trace id. in lower case
+	 */
 	String TRACE_ID_LOW = INSPECTIT_PREFIX + "Traceid";
 
+	/**
+	 * Header name for the parent id. in lower case
+	 */
 	String PARENT_ID_LOW = INSPECTIT_PREFIX + "Parentid";
 }

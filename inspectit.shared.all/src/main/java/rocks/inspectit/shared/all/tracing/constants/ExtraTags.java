@@ -51,4 +51,9 @@ public interface ExtraTags {
 	 * The class name of the traced runnable.
 	 */
 	String RUNNABLE_TYPE = "ext.runnable.type";
+
+	/**
+	 * The local service name of the current trace.
+	 */
+	String LOCAL_SERVICE_NAME = "local.service.name";
 }

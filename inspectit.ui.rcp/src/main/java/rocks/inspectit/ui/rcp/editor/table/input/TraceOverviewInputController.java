@@ -325,7 +325,7 @@ public class TraceOverviewInputController extends AbstractTableInputController i
 		Collection<Span> filteredSpans = new ArrayList<Span>();
 		for (Span span : spans) {
 			if (span.getTags().containsKey("http.url")) {
-				if (!span.getTags().get("http.url").matches(".{0,}(.css|.js|http://172.17.0.1:8182/rest/api/v2/spans|.jpg|.html|.png)")) {
+				if (!span.getTags().get("http.url").matches(".{0,}(.css|.js|/spans|.jpg|.html|.png|.jpeg|.woff|.map|=4.0.3)")) {
 					filteredSpans.add(span);
 				}
 			}

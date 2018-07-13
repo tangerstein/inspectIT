@@ -5,6 +5,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +31,12 @@ import rocks.inspectit.server.cache.impl.BufferElement;
 import rocks.inspectit.server.service.rest.error.JsonError;
 import rocks.inspectit.server.util.CacheIdGenerator;
 import rocks.inspectit.shared.all.communication.DefaultData;
+import rocks.inspectit.shared.all.tracing.constants.ExtraTags;
 import rocks.inspectit.shared.all.tracing.data.AbstractSpan;
+import rocks.inspectit.shared.all.tracing.data.ClientSpan;
+import rocks.inspectit.shared.all.tracing.data.PropagationType;
+import rocks.inspectit.shared.all.tracing.data.SpanIdent;
+import rocks.inspectit.shared.cs.cmr.service.ISpanService;
 import zipkin.SpanDecoder;
 import zipkin2.codec.SpanBytesDecoder;
 
@@ -45,6 +51,9 @@ public class ZipkinHttpCollector {
 	 */
 	@Autowired
 	private IBuffer<DefaultData> buffer;
+
+	@Autowired
+	private ISpanService spanService;
 
 	static final String APPLICATION_THRIFT = "application/x-thrift";
 	/**
@@ -76,6 +85,21 @@ public class ZipkinHttpCollector {
 	@ResponseBody
 	public ResponseEntity<HttpStatus> uploadSpansJson2(@RequestHeader(value = "Content-Encoding", required = false) String encoding, @RequestBody byte[] body) throws InterruptedException, ExecutionException {
 		return validateAndStoreSpans(encoding, body, InputType.V2);
+	}
+
+	/**
+	 * Rest interface for V1 spans.
+	 * 
+	 * @param encoding
+	 * @param body
+	 * @return
+	 * @throws InterruptedException
+	 * @throws ExecutionException
+	 */
+	@RequestMapping(value = "/v1withoutthrift/spans", method = POST)
+	@ResponseBody
+	public ResponseEntity<HttpStatus> uploadSpansJson(@RequestHeader(value = "Content-Encoding", required = false) String encoding, @RequestBody byte[] body) throws InterruptedException, ExecutionException {
+		return validateAndStoreSpans(encoding, body, InputType.V1);
 	}
 
 	/**
@@ -122,13 +146,10 @@ public class ZipkinHttpCollector {
 				e.printStackTrace();
 			}
 
-
 		} else if (inputType.equals(InputType.V2)) {
 			List<zipkin2.Span> spans = decodeV2(body);
 			safeSpansToBuffer(spans);
 		}
-
-
 
 		return SUCCESS;
 	}
@@ -139,18 +160,42 @@ public class ZipkinHttpCollector {
 	private boolean safeSpansToBuffer(List spans) {
 		for (Object span : spans) {
 			AbstractSpan abstractSpan = ZipkinSpanTransformer.transformSpan(span);
+
 			if (null != abstractSpan) {
-			abstractSpan.setPlatformIdent(-1);
-			abstractSpan.setMethodIdent(0);
-			abstractSpan.setSensorTypeIdent(0);
-			idGenerator.assignObjectAnId(abstractSpan);
-			buffer.put(new BufferElement<DefaultData>(abstractSpan));
+				// FIXME: not efficient
+				if (abstractSpan.getDuration() == -1) {
+					continue;
+				}
+				if (abstractSpan.getTags().containsKey("http.url") && abstractSpan.getTags().get("http.url").contains("/spans")) {
+					continue;
+				}
+				abstractSpan.setPlatformIdent(-1);
+				abstractSpan.setMethodIdent(0);
+				abstractSpan.setSensorTypeIdent(0);
+				idGenerator.assignObjectAnId(abstractSpan);
+				buffer.put(new BufferElement<DefaultData>(abstractSpan));
 			} else {
 				return false;
 			}
 		}
 		return true;
 
+	}
+
+	private void addDefaultSpan() {
+		if (spanService.getRootSpans(Integer.MAX_VALUE, null, null, null).isEmpty()) {
+			ClientSpan defaultDebugSpan = new ClientSpan();
+			defaultDebugSpan.addTag(ExtraTags.OPERATION_NAME, "DEBUG SPAN (SpanID 1; TraceID 1)");
+			defaultDebugSpan.setSpanIdent(new SpanIdent(1, 1));
+			defaultDebugSpan.setDuration(1);
+			defaultDebugSpan.setTimeStamp(new Timestamp(System.currentTimeMillis()));
+			defaultDebugSpan.setPropagationType(PropagationType.ZIPKIN);
+			defaultDebugSpan.setPlatformIdent(-1);
+			defaultDebugSpan.setMethodIdent(0);
+			defaultDebugSpan.setSensorTypeIdent(0);
+			idGenerator.assignObjectAnId(defaultDebugSpan);
+			buffer.put(new BufferElement<DefaultData>(defaultDebugSpan));
+		}
 	}
 
 	private static final ThreadLocal<byte[]> GZIP_BUFFER = new ThreadLocal<byte[]>() {

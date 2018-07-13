@@ -252,6 +252,19 @@ public class TracerImpl implements ExtendedTracer {
 	}
 
 	/**
+	 * Returns the current span.
+	 * 
+	 * @return current span
+	 */
+	public SpanImpl getCurrentSpan() {
+		Stack<SpanImpl> stack = spanStack.get();
+		if (!stack.isEmpty()) {
+			return stack.peek();
+		}
+		return null;
+	}
+
+	/**
 	 * Returns if the thread context exists.
 	 *
 	 * @return Returns if the thread context exists.

@@ -267,4 +267,5 @@ public class SpanContextImpl implements SpanContext {
 		return "SpanContextImpl [id=" + this.id + ", traceId=" + this.traceId + ", parentId=" + this.parentId + ", referenceType=" + this.referenceType + ", baggage=" + this.baggage + "]";
 	}
 
+
 }

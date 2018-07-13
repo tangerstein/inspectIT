@@ -90,16 +90,13 @@ public abstract class AbstractPropagator<C> implements Propagator<C> {
 		Map<String, String> passedBaggage = new HashMap<String, String>();
 		String idFromBaggage = null;
 		String traceIdFromBaggage = null;
-		String parentIdFromBaggage = null;
 		// iterate over the baggage
 		for (Entry<String, String> e : iterable) {
 			String key = e.getKey();
-			if (PropagationConstants.SPAN_ID.toUpperCase().equals(key.toUpperCase())) {
+			if (PropagationConstants.SPAN_ID.equalsIgnoreCase(key)) {
 				idFromBaggage = e.getValue();
-			} else if (PropagationConstants.TRACE_ID.toUpperCase().equals(key.toUpperCase())) {
+			} else if (PropagationConstants.TRACE_ID.equalsIgnoreCase(key)) {
 				traceIdFromBaggage = e.getValue();
-			} else if (PropagationConstants.PARENT_ID.toUpperCase().equals(key.toUpperCase())) {
-				parentIdFromBaggage = e.getValue();
 			} else if (key.startsWith(PropagationConstants.INSPECTIT_BAGGAGE_PREFIX)) {
 				String realKey = key.substring(PropagationConstants.INSPECTIT_BAGGAGE_PREFIX.length());
 				passedBaggage.put(realKey, e.getValue());
@@ -111,7 +108,6 @@ public abstract class AbstractPropagator<C> implements Propagator<C> {
 			try {
 				long id = ConversionUtils.parseHexStringSafe(idFromBaggage);
 				long traceId = ConversionUtils.parseHexStringSafe(traceIdFromBaggage);
-				long parentId = ConversionUtils.parseHexStringSafe(parentIdFromBaggage);
 				return SpanContextImpl.buildExtractedContext(id, traceId, passedBaggage);
 			} catch (NumberFormatException e) {
 				if (LOGGER.isWarnEnabled()) {

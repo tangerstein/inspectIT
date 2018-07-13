@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.spec.research.open.xtrace.adapters.inspectit.source.InspectITTraceConverter;
+import org.spec.research.open.xtrace.adapters.inspectit.source.SpanConverterHelper;
 import org.spec.research.open.xtrace.api.core.Trace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,19 @@ import rocks.inspectit.shared.all.communication.DefaultData;
 import rocks.inspectit.shared.all.communication.data.InvocationSequenceData;
 import rocks.inspectit.shared.all.tracing.data.AbstractSpan;
 import rocks.inspectit.shared.all.tracing.data.Span;
+import rocks.inspectit.shared.all.tracing.data.SpanIdent;
 import rocks.inspectit.shared.cs.cmr.service.IInvocationDataAccessService;
 import rocks.inspectit.shared.cs.cmr.service.ISpanService;
+import rocks.inspectit.shared.cs.cmr.service.cache.CachedDataService;
 import rocks.inspectit.shared.cs.communication.comparator.ResultComparator;
 
 @Service
 public class OPENxtraceAccessService {
 	@Autowired
 	private PlatformIdentDaoImpl platformIdentDao;
+
+	@Autowired
+	private CachedDataService cachedDataService;
 
 	@Autowired
 	private IBuffer<DefaultData> buffer;
@@ -56,16 +62,46 @@ public class OPENxtraceAccessService {
 
 		InspectITTraceConverter converter = new InspectITTraceConverter();
 
-		Collection<? extends Span> rootSpans = spansService.getRootSpans(limit, fromDate, toDate, resultComparator);
+		Collection<? extends Span> rootSpans = SpanConverterHelper.filterStaticResources(spansService.getRootSpans(limit, fromDate, toDate, resultComparator));
 
 		// convert spans and trigger diagnoseIT
 		for (Span span : rootSpans) {
 			HashSet<Span> abstractSpans = new HashSet<Span>();
 			abstractSpans.addAll(spansService.getSpans(span.getSpanIdent().getTraceId()));
 			abstractSpans.add(span);
-			resultList.add(converter.convertTrace(listSequencesDetail, platformIdentList, new ArrayList<Span>(abstractSpans)));
+			resultList.add(converter.convertTrace(listSequencesDetail, platformIdentList, new ArrayList<Span>(abstractSpans), cachedDataService));
 		}
 		return resultList;
+	}
+
+	public Trace getOpenXTRACETrace(long id) {
+		// Get all PlatformIdents
+		List<PlatformIdent> platformIdentList = platformIdentDao.findAll();
+
+		List<InvocationSequenceData> listSequences = dataAccessService.getInvocationSequenceOverview(0, -1, null);
+		List<InvocationSequenceData> listSequencesDetail = new LinkedList<InvocationSequenceData>();
+
+		// Get all invocs
+		for (InvocationSequenceData invocationSequenceData : listSequences) {
+			InvocationSequenceData invocDetail = dataAccessService.getInvocationSequenceDetail(invocationSequenceData);
+			// is already nested sequence?
+			if (invocDetail != null) {
+				listSequencesDetail.add(invocDetail);
+			}
+		}
+
+		InspectITTraceConverter converter = new InspectITTraceConverter();
+
+		Span span = spansService.get(new SpanIdent(id, id));
+
+		if (null == span) {
+			return null;
+		}
+
+		HashSet<Span> abstractSpans = new HashSet<Span>();
+		abstractSpans.addAll(spansService.getSpans(span.getSpanIdent().getTraceId()));
+		abstractSpans.add(span);
+		return converter.convertTrace(listSequencesDetail, platformIdentList, new ArrayList<Span>(abstractSpans), cachedDataService);
 	}
 
 }
