@@ -176,7 +176,7 @@ public abstract class AbstractSpan extends MethodSensorData implements Span {
 	 */
 	@Override
 	public boolean isRoot() {
-		return this.parentSpanId == 0;
+		return this.getSpanIdent().getTraceId() == this.getSpanIdent().getId();
 	}
 
 	/**
