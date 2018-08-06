@@ -11,6 +11,10 @@ repositories {
 		url "http://repository.novatec-gmbh.de/content/repositories/3rd_party_libs/"
 	}
 	maven {
+		name 'diagnoseIT.Nexus@NT'
+		url "https://repository.novatec-gmbh.de/content/repositories/diagnoseIT/"
+	}
+	maven {
 		name 'SpringSource - External Bundle Releases'
 		url "http://repository.springsource.com/maven/bundles/external/"
 	}
@@ -244,8 +248,9 @@ dependencies {
 		'javax.mail:mail:1.4',
 		'io.zipkin.java:zipkin:2.3.1',
 		'org.json:json:20171018',
-		files('/home/tan/Desktop/libs/open.xtrace.adapters.inspectit.jar'),
-		files('/home/tan/Desktop/libs/open.xtrace.jar')
+		'org.spec.research:open.xtrace.api:0.2.1',
+		'org.spec.research:open.xtrace.default.impl:0.2.1',
+		'org.spec.research:open.xtrace.adapters.inspectit:0.2.1'
 	)
 	
 	/** inspectit.server.diagnosis */
