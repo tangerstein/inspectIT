@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.spec.research.open.xtrace.adapters.inspectit.source.InspectITTraceConverter;
-import org.spec.research.open.xtrace.adapters.inspectit.source.SpanConverterHelper;
 import org.spec.research.open.xtrace.api.core.Trace;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,7 +61,7 @@ public class OPENxtraceAccessService {
 
 		InspectITTraceConverter converter = new InspectITTraceConverter();
 
-		Collection<? extends Span> rootSpans = SpanConverterHelper.filterStaticResources(spansService.getRootSpans(limit, fromDate, toDate, resultComparator));
+		Collection<? extends Span> rootSpans = spansService.getRootSpans(limit, fromDate, toDate, resultComparator);
 
 		// convert spans and trigger diagnoseIT
 		for (Span span : rootSpans) {
