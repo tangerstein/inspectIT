@@ -216,6 +216,15 @@ public final class ZipkinSpanTransformer implements Transformer {
 	 * @return {@link AbstractSpan}
 	 */
 	private static AbstractSpan createCorrectSpanType(zipkin.Span zipkinSpan) {
+		for (BinaryAnnotation annotation : zipkinSpan.binaryAnnotations) {
+			if (new String(annotation.key).equals("span.kind")) {
+				if (new String(annotation.value).equals("server")) {
+					return new ServerSpan();
+				} else {
+					return new ClientSpan();
+				}
+			}
+		}
 		return new ClientSpan();
 	}
 
